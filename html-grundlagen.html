@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML Grundlagen – Die ersten Tags</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bulma-primary: #00d1b2;
+      --bulma-link: #3273dc;
+    }
+    body {
+      background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+      min-height: 100vh;
+    }
+    .hero.is-primary {
+      background: linear-gradient(135deg, #00d1b2 0%, #209cee 100%);
+    }
+    .code-box {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      position: relative;
+    }
+    .code-box .tag-name { color: #f472b6; }
+    .code-box .attr { color: #38bdf8; }
+    .code-box .string { color: #a3e635; }
+    .code-box .comment { color: #94a3b8; font-style: italic; }
+    .preview-box {
+      background: white;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      min-height: 80px;
+    }
+    .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .section-title {
+      border-left: 5px solid #00d1b2;
+      padding-left: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .tag-badge {
+      font-family: monospace;
+      font-weight: 600;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .footer {
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+    .footer a { color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero is-primary is-medium">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <p class="title is-1 has-text-white">
+          <i class="fa-brands fa-html5 mr-3"></i>HTML Grundlagen
+        </p>
+        <p class="subtitle is-4 has-text-white mt-3">
+          Die ersten wichtigen Tags – klar erklärt & schön dargestellt
+        </p>
+        <div class="tags is-centered mt-5">
+          <span class="tag is-light is-medium">Überschriften</span>
+          <span class="tag is-light is-medium">Fett & Kursiv</span>
+          <span class="tag is-light is-medium">Zeilenumbruch</span>
+          <span class="tag is-light is-medium">Absätze</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Inhaltsverzeichnis -->
+  <section class="section py-5">
+    <div class="container">
+      <div class="box has-background-white">
+        <h2 class="title is-4 mb-4">
+          <i class="fa-solid fa-list-ul has-text-primary mr-2"></i>Inhalt
+        </h2>
+        <div class="columns is-multiline">
+          <div class="column is-6">
+            <ul>
+              <li><a href="#grundgeruest">1. Minimales HTML-Grundgerüst</a></li>
+              <li><a href="#ueberschriften">2. Überschriften (h1–h6)</a></li>
+              <li><a href="#fett-kursiv">3. Fett & Kursiv</a></li>
+            </ul>
+          </div>
+          <div class="column is-6">
+            <ul>
+              <li><a href="#zeilenumbruch">4. Zeilenumbruch (br)</a></li>
+              <li><a href="#absatz">5. Absatz & Abschnitt (p, section)</a></li>
+              <li><a href="#zusammenfassung">6. Zusammenfassung</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. Grundgerüst -->
+  <section class="section" id="grundgeruest">
+    <div class="container">
+      <h2 class="title is-3 section-title">1. Das minimale HTML-Grundgerüst</h2>
+      <p class="subtitle is-5 mb-5">
+        Jede HTML-Datei beginnt mit diesem Gerüst. Es ist die Basis für alles Weitere.
+      </p>
+
+      <div class="columns is-desktop">
+        <div class="column is-7">
+          <div class="code-box">
+<pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="de"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;
+    &lt;title&gt;Meine erste Seite&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;!-- Hier kommt der sichtbare Inhalt rein --&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</pre>
+          </div>
+        </div>
+        <div class="column is-5">
+          <div class="box has-background-light">
+            <h3 class="title is-5">Wichtige Bestandteile</h3>
+            <ul>
+              <li class="mb-2"><strong>&lt;!DOCTYPE html&gt;</strong> – sagt dem Browser: „Das ist HTML5“</li>
+              <li class="mb-2"><strong>&lt;html&gt;</strong> – das Wurzelelement der gesamten Seite</li>
+              <li class="mb-2"><strong>&lt;head&gt;</strong> – Metadaten (Titel, Zeichensatz, CSS …)</li>
+              <li class="mb-2"><strong>&lt;body&gt;</strong> – alles, was der Besucher sieht</li>
+              <li class="mb-2"><strong>lang="de"</strong> – Sprache der Seite (hilft Screenreadern & Suchmaschinen)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Überschriften -->
+  <section class="section has-background-white" id="ueberschriften">
+    <div class="container">
+      <h2 class="title is-3 section-title">2. Überschriften – &lt;h1&gt; bis &lt;h6&gt;</h2>
+      <p class="mb-5">
+        Überschriften gliedern den Text und geben ihm Struktur. 
+        <strong>&lt;h1&gt;</strong> ist die wichtigste Überschrift (meist nur einmal pro Seite), 
+        <strong>&lt;h6&gt;</strong> die kleinste.
+      </p>
+
+      <div class="columns is-multiline">
+        <!-- Code -->
+        <div class="column is-6">
+          <h3 class="title is-5">
+            <span class="tag is-primary is-light tag-badge mr-2">Code</span>
+          </h3>
+          <div class="code-box">
+<pre>&lt;h1&gt;Hauptüberschrift&lt;/h1&gt;
+&lt;h2&gt;Unterüberschrift&lt;/h2&gt;
+&lt;h3&gt;Abschnittsüberschrift&lt;/h3&gt;
+&lt;h4&gt;Noch eine Ebene tiefer&lt;/h4&gt;
+&lt;h5&gt;Kleine Überschrift&lt;/h5&gt;
+&lt;h6&gt;Kleinste Überschrift&lt;/h6&gt;</pre>
+          </div>
+        </div>
+
+        <!-- Vorschau -->
+        <div class="column is-6">
+          <h3 class="title is-5">
+            <span class="tag is-info is-light tag-badge mr-2">Ergebnis</span>
+          </h3>
+          <div class="preview-box">
+            <h1 class="title is-3">Hauptüberschrift</h1>
+            <h2 class="title is-4">Unterüberschrift</h2>
+            <h3 class="title is-5">Abschnittsüberschrift</h3>
+            <h4 class="title is-6">Noch eine Ebene tiefer</h4>
+            <h5 class="subtitle is-6">Kleine Überschrift</h5>
+            <h6 class="subtitle is-6 has-text-grey">Kleinste Überschrift</h6>
+          </div>
+        </div>
+      </div>
+
+      <div class="notification is-info is-light mt-5">
+        <strong>Tipp:</strong> Verwende Überschriften hierarchisch (h1 → h2 → h3 …). 
+        Springe nicht von h1 direkt zu h4 – das ist schlecht für die Barrierefreiheit und SEO.
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Fett & Kursiv -->
+  <section class="section" id="fett-kursiv">
+    <div class="container">
+      <h2 class="title is-3 section-title">3. Fett und Kursiv</h2>
+      <p class="mb-5">
+        Mit diesen Tags hebst du wichtige Wörter oder ganze Passagen hervor.
+      </p>
+
+      <div class="columns is-multiline">
+        <div class="column is-6">
+          <div class="card">
+            <div class="card-content">
+              <h3 class="title is-5">
+                <span class="tag is-danger is-light tag-badge">Fett</span>
+              </h3>
+              <div class="code-box mb-4">
+<pre>&lt;strong&gt;Wichtiger Text&lt;/strong&gt;
+&lt;b&gt;Auch fett, aber weniger semantisch&lt;/b&gt;</pre>
+              </div>
+              <div class="preview-box">
+                <p><strong>Wichtiger Text</strong></p>
+                <p><b>Auch fett, aber weniger semantisch</b></p>
+              </div>
+              <p class="help mt-3">
+                <strong>&lt;strong&gt;</strong> hat semantische Bedeutung („wichtig“). 
+                <strong>&lt;b&gt;</strong> ist rein optisch.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-6">
+          <div class="card">
+            <div class="card-content">
+              <h3 class="title is-5">
+                <span class="tag is-warning is-light tag-badge">Kursiv</span>
+              </h3>
+              <div class="code-box mb-4">
+<pre>&lt;em&gt;Betonter Text&lt;/em&gt;
+&lt;i&gt;Auch kursiv, aber weniger semantisch&lt;/i&gt;</pre>
+              </div>
+              <div class="preview-box">
+                <p><em>Betonter Text</em></p>
+                <p><i>Auch kursiv, aber weniger semantisch</i></p>
+              </div>
+              <p class="help mt-3">
+                <strong>&lt;em&gt;</strong> bedeutet „Betonung“. 
+                <strong>&lt;i&gt;</strong> ist rein optisch (z. B. für Fremdwörter).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box mt-5 has-background-primary-light">
+        <p class="has-text-weight-medium">
+          <i class="fa-solid fa-lightbulb has-text-primary mr-2"></i>
+          Du kannst Tags auch verschachteln: 
+          <strong><em>Das ist fett und kursiv zugleich.</em></strong>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. Zeilenumbruch -->
+  <section class="section has-background-white" id="zeilenumbruch">
+    <div class="container">
+      <h2 class="title is-3 section-title">4. Zeilenumbruch – &lt;br&gt;</h2>
+      <p class="mb-5">
+        Der Tag <code>&lt;br&gt;</code> (break) erzeugt einen Zeilenumbruch. 
+        Er ist ein <strong>leerer Tag</strong> – er braucht kein schließendes Tag.
+      </p>
+
+      <div class="columns is-desktop">
+        <div class="column is-6">
+          <div class="code-box">
+<pre>&lt;p&gt;
+  Erste Zeile&lt;br&gt;
+  Zweite Zeile&lt;br&gt;
+  Dritte Zeile
+&lt;/p&gt;</pre>
+          </div>
+        </div>
+        <div class="column is-6">
+          <div class="preview-box">
+            <p>
+              Erste Zeile<br>
+              Zweite Zeile<br>
+              Dritte Zeile
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="notification is-warning is-light mt-5">
+        <strong>Achtung:</strong> Verwende <code>&lt;br&gt;</code> sparsam! 
+        Für echte Absätze ist der <code>&lt;p&gt;</code>-Tag die bessere Wahl. 
+        Zu viele <code>&lt;br&gt;</code> machen den Text unübersichtlich und erschweren die Pflege.
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Absatz & Abschnitt -->
+  <section class="section" id="absatz">
+    <div class="container">
+      <h2 class="title is-3 section-title">5. Absatz und Abschnitt</h2>
+
+      <div class="columns is-multiline">
+        <!-- p-Tag -->
+        <div class="column is-6">
+          <div class="card h-100">
+            <div class="card-content">
+              <h3 class="title is-5">
+                <span class="tag is-success is-light tag-badge">Absatz – &lt;p&gt;</span>
+              </h3>
+              <p class="mb-4">
+                Der <strong>Absatz</strong> ist der wichtigste Textcontainer. 
+                Browser fügen automatisch Abstand vor und nach dem Absatz ein.
+              </p>
+              <div class="code-box mb-4">
+<pre>&lt;p&gt;Das ist der erste Absatz. 
+Er kann mehrere Sätze enthalten.&lt;/p&gt;
+
+&lt;p&gt;Das ist der zweite Absatz. 
+Zwischen den Absätzen entsteht 
+automatisch Abstand.&lt;/p&gt;</pre>
+              </div>
+              <div class="preview-box">
+                <p>Das ist der erste Absatz. Er kann mehrere Sätze enthalten.</p>
+                <p>Das ist der zweite Absatz. Zwischen den Absätzen entsteht automatisch Abstand.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- section-Tag -->
+        <div class="column is-6">
+          <div class="card h-100">
+            <div class="card-content">
+              <h3 class="title is-5">
+                <span class="tag is-link is-light tag-badge">Abschnitt – &lt;section&gt;</span>
+              </h3>
+              <p class="mb-4">
+                Mit <strong>&lt;section&gt;</strong> gliederst du die Seite in thematische Bereiche. 
+                Es ist ein semantisches Element und hilft Screenreadern und Suchmaschinen.
+              </p>
+              <div class="code-box mb-4">
+<pre>&lt;section&gt;
+  &lt;h2&gt;Über mich&lt;/h2&gt;
+  &lt;p&gt;Hier steht etwas über mich.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+  &lt;h2&gt;Meine Hobbys&lt;/h2&gt;
+  &lt;p&gt;Hier kommen die Hobbys hin.&lt;/p&gt;
+&lt;/section&gt;</pre>
+              </div>
+              <div class="preview-box">
+                <section class="mb-4">
+                  <h2 class="title is-5">Über mich</h2>
+                  <p>Hier steht etwas über mich.</p>
+                </section>
+                <section>
+                  <h2 class="title is-5">Meine Hobbys</h2>
+                  <p>Hier kommen die Hobbys hin.</p>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Zusammenfassung -->
+  <section class="section has-background-white" id="zusammenfassung">
+    <div class="container">
+      <h2 class="title is-3 section-title">6. Zusammenfassung – Die wichtigsten Tags</h2>
+
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+            <tr>
+              <th>Tag</th>
+              <th>Bedeutung</th>
+              <th>Beispiel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>&lt;h1&gt; … &lt;h6&gt;</code></td>
+              <td>Überschriften (von groß nach klein)</td>
+              <td><code>&lt;h1&gt;Willkommen&lt;/h1&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>&lt;strong&gt;</code> / <code>&lt;b&gt;</code></td>
+              <td>Fett (semantisch / optisch)</td>
+              <td><code>&lt;strong&gt;Wichtig!&lt;/strong&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>&lt;em&gt;</code> / <code>&lt;i&gt;</code></td>
+              <td>Kursiv (semantisch / optisch)</td>
+              <td><code>&lt;em&gt;Betonung&lt;/em&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>&lt;br&gt;</code></td>
+              <td>Zeilenumbruch (leerer Tag)</td>
+              <td><code>Zeile 1&lt;br&gt;Zeile 2</code></td>
+            </tr>
+            <tr>
+              <td><code>&lt;p&gt;</code></td>
+              <td>Absatz</td>
+              <td><code>&lt;p&gt;Ein Absatz.&lt;/p&gt;</code></td>
+            </tr>
+            <tr>
+              <td><code>&lt;section&gt;</code></td>
+              <td>Thematischer Abschnitt</td>
+              <td><code>&lt;section&gt;…&lt;/section&gt;</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box has-background-success-light mt-5">
+        <h3 class="title is-5 has-text-success">
+          <i class="fa-solid fa-check-circle mr-2"></i>Profi-Tipp
+        </h3>
+        <p>
+          Schreibe immer sauberes, semantisches HTML. 
+          Nutze <code>&lt;strong&gt;</code> statt <code>&lt;b&gt;</code> und <code>&lt;em&gt;</code> statt <code>&lt;i&gt;</code>, 
+          wenn der Inhalt wirklich betont werden soll. 
+          Das verbessert die Barrierefreiheit und die Suchmaschinenoptimierung.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abschluss -->
+  <section class="section">
+    <div class="container has-text-centered">
+      <div class="box">
+        <h2 class="title is-4">Geschafft!</h2>
+        <p class="subtitle is-5">
+          Du kennst jetzt die wichtigsten Grundbausteine von HTML.
+        </p>
+        <p class="mb-4">
+          Speichere diese Datei als <code>index.html</code> und öffne sie im Browser – 
+          dann siehst du sofort das Ergebnis.
+        </p>
+        <a href="#grundgeruest" class="button is-primary is-medium">
+          <span class="icon"><i class="fa-solid fa-arrow-up"></i></span>
+          <span>Zurück zum Anfang</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>HTML Grundlagen</strong> – erstellt mit 
+        <a href="https://bulma.io" target="_blank" rel="noopener">Bulma CSS</a>.
+        <br>
+        Viel Spaß beim Coden!
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

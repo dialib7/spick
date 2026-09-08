@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Einführung in Bulma CSS</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(160deg, #f8fafc 0%, #eef2ff 100%);
+      min-height: 100vh;
+    }
+    .hero.is-primary {
+      background: linear-gradient(135deg, #00d1b2 0%, #209cee 100%);
+    }
+    .code-box {
+      background: #1e293b;
+      color: #e2e8f0;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      overflow-x: auto;
+    }
+    .section-title {
+      border-left: 5px solid #00d1b2;
+      padding-left: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border: none;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .footer {
+      background: #1e293b;
+      color: #cbd5e1;
+    }
+    .footer a { color: #38bdf8; }
+    .feature-icon {
+      font-size: 2rem;
+      color: #00d1b2;
+      margin-bottom: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <section class="hero is-primary is-medium">
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <p class="title is-1 has-text-white">
+          <i class="fa-solid fa-paint-brush mr-3"></i>Bulma CSS
+        </p>
+        <p class="subtitle is-4 has-text-white mt-3">
+          Eine kurze & klare Einführung
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Was ist Bulma? -->
+  <section class="section">
+    <div class="container">
+      <h2 class="title is-3 section-title">Was ist Bulma?</h2>
+      
+      <div class="columns is-desktop">
+        <div class="column is-7">
+          <div class="content is-medium">
+            <p>
+              <strong>Bulma</strong> ist ein modernes, kostenloses CSS-Framework. 
+              Es hilft dir, schöne und responsive Webseiten zu bauen – 
+              ohne dass du viel eigenes CSS schreiben musst.
+            </p>
+            <p>
+              Im Gegensatz zu manchen anderen Frameworks kommt Bulma 
+              <strong>ohne JavaScript</strong> aus. Du bindest einfach eine CSS-Datei ein 
+              und kannst direkt mit fertigen Klassen arbeiten.
+            </p>
+            <p>
+              Die Klassen haben klare, sprechende Namen wie 
+              <code>button</code>, <code>card</code>, <code>hero</code>, 
+              <code>columns</code> oder <code>notification</code>.
+            </p>
+          </div>
+        </div>
+
+        <div class="column is-5">
+          <div class="box has-background-light">
+            <h3 class="title is-5">Die wichtigsten Vorteile</h3>
+            <ul>
+              <li class="mb-2"><strong>Einfach</strong> – klare Klassennamen</li>
+              <li class="mb-2"><strong>Modern</strong> – basiert auf Flexbox</li>
+              <li class="mb-2"><strong>Leicht</strong> – kein JavaScript nötig</li>
+              <li class="mb-2"><strong>Kostenlos</strong> – Open Source (MIT-Lizenz)</li>
+              <li class="mb-2"><strong>Responsive</strong> – funktioniert auf Handy & Desktop</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stylesheet einbinden -->
+  <section class="section has-background-white">
+    <div class="container">
+      <h2 class="title is-3 section-title">Stylesheet einbinden</h2>
+      <p class="mb-5">
+        Am einfachsten bindest du Bulma über ein CDN ein. 
+        Füge dazu einfach diese Zeile in den <code>&lt;head&gt;</code> deiner HTML-Datei ein:
+      </p>
+
+      <div class="notification is-primary is-light">
+        <p class="has-text-weight-medium mb-3">
+          <i class="fa-solid fa-palette mr-2"></i>Verwendetes Stylesheet (CDN)
+        </p>
+        <div class="code-box">
+<pre>&lt;link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css"&gt;</pre>
+        </div>
+      </div>
+
+      <div class="content mt-5">
+        <p>
+          Das war’s schon. Ab jetzt stehen dir alle Bulma-Klassen zur Verfügung.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Beispiele -->
+  <section class="section">
+    <div class="container">
+      <h2 class="title is-3 section-title">Kleine Beispiele</h2>
+      <p class="mb-5">So einfach sieht der Einsatz von Bulma aus:</p>
+
+      <div class="columns is-multiline">
+        <!-- Buttons -->
+        <div class="column is-6">
+          <div class="card">
+            <div class="card-content">
+              <h3 class="title is-5">Buttons</h3>
+              <div class="code-box mb-4" style="font-size: 0.85rem;">
+<pre>&lt;button class="button is-primary"&gt;Primary&lt;/button&gt;
+&lt;button class="button is-link"&gt;Link&lt;/button&gt;
+&lt;button class="button is-info"&gt;Info&lt;/button&gt;</pre>
+              </div>
+              <div class="buttons">
+                <button class="button is-primary">Primary</button>
+                <button class="button is-link">Link</button>
+                <button class="button is-info">Info</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notification -->
+        <div class="column is-6">
+          <div class="card">
+            <div class="card-content">
+              <h3 class="title is-5">Hinweis-Box</h3>
+              <div class="code-box mb-4" style="font-size: 0.85rem;">
+<pre>&lt;div class="notification is-primary is-light"&gt;
+  Das ist ein Hinweis.
+&lt;/div&gt;</pre>
+              </div>
+              <div class="notification is-primary is-light">
+                Das ist ein Hinweis.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columns -->
+        <div class="column is-12">
+          <div class="card">
+            <div class="card-content">
+              <h3 class="title is-5">Spalten-Layout</h3>
+              <div class="code-box mb-4" style="font-size: 0.85rem;">
+<pre>&lt;div class="columns"&gt;
+  &lt;div class="column"&gt;Spalte 1&lt;/div&gt;
+  &lt;div class="column"&gt;Spalte 2&lt;/div&gt;
+  &lt;div class="column"&gt;Spalte 3&lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="columns has-text-centered">
+                <div class="column">
+                  <div class="box has-background-primary-light">Spalte 1</div>
+                </div>
+                <div class="column">
+                  <div class="box has-background-info-light">Spalte 2</div>
+                </div>
+                <div class="column">
+                  <div class="box has-background-success-light">Spalte 3</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section has-background-white">
+    <div class="container">
+      <h2 class="title is-3 section-title">Was Bulma besonders macht</h2>
+
+      <div class="columns is-multiline">
+        <div class="column is-4">
+          <div class="has-text-centered p-4">
+            <div class="feature-icon">
+              <i class="fa-solid fa-code"></i>
+            </div>
+            <h3 class="title is-5">Nur CSS</h3>
+            <p>Kein JavaScript nötig. Einfach einbinden und loslegen.</p>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="has-text-centered p-4">
+            <div class="feature-icon">
+              <i class="fa-solid fa-mobile-screen"></i>
+            </div>
+            <h3 class="title is-5">Responsive</h3>
+            <p>Layouts passen sich automatisch an Smartphone, Tablet und Desktop an.</p>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="has-text-centered p-4">
+            <div class="feature-icon">
+              <i class="fa-solid fa-font"></i>
+            </div>
+            <h3 class="title is-5">Klare Namen</h3>
+            <p>Klassen wie <code>is-primary</code> oder <code>has-text-centered</code> sind selbsterklärend.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Weiterführende Links -->
+  <section class="section">
+    <div class="container">
+      <div class="box">
+        <h2 class="title is-4">Mehr erfahren</h2>
+        <p class="mb-4">
+          Die offizielle Dokumentation ist sehr gut und enthält viele Beispiele:
+        </p>
+        <div class="buttons">
+          <a href="https://bulma.io" target="_blank" rel="noopener" class="button is-primary">
+            <span class="icon"><i class="fa-solid fa-arrow-up-right-from-square"></i></span>
+            <span>bulma.io</span>
+          </a>
+          <a href="https://bulma.io/documentation/" target="_blank" rel="noopener" class="button is-link is-outlined">
+            <span>Dokumentation</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Einführung in Bulma CSS</strong>
+      </p>
+      <p class="is-size-7 mt-2 has-text-grey-light">
+        Stylesheet: 
+        <code>https://cdn.jsdelivr.net/npm/bulma@1.0.4/css/bulma.min.css</code>
+      </p>
+      <p class="mt-3">
+        Viel Spaß beim Gestalten!
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
