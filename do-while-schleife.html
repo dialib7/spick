@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Die do-while-Schleife: Schritt für Schritt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E14;
+    --panel:#11151C;
+    --panel-alt:#161B22;
+    --border:#232A35;
+    --border-soft:#1B212B;
+    --text:#C9D1D9;
+    --text-dim:#6E7681;
+    --text-bright:#F0F3F6;
+    --accent-blue:#79A6DC;
+    --accent-amber:#F2B84B;
+    --accent-green:#5FE38A;
+    --accent-red:#F2555A;
+    --code-kw:#79A6DC;
+    --code-str:#D19A66;
+    --code-ty:#4FC1A6;
+    --term-fg:#6FE3A0;
+    --term-fg-bright:#A6FFC1;
+    --font-mono:'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+    --font-sans:'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--font-sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:2.5rem 1.5rem 3.5rem;}
+
+  header.page-head{margin-bottom:2rem;max-width:56ch;}
+  header.page-head h1{
+    font-size:1.7rem;
+    font-weight:600;
+    color:var(--text-bright);
+    margin:0 0 0.6rem;
+    letter-spacing:-0.01em;
+  }
+  header.page-head p{
+    margin:0;
+    color:var(--text-dim);
+    font-size:1rem;
+  }
+
+  .main-grid{
+    display:grid;
+    grid-template-columns:1.15fr 1fr;
+    gap:1.25rem;
+    align-items:start;
+  }
+  @media (max-width:900px){
+    .main-grid{grid-template-columns:1fr;}
+  }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .panel-head{
+    padding:0.7rem 1rem;
+    border-bottom:1px solid var(--border);
+    font-size:0.8rem;
+    color:var(--text-dim);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .panel-head .dots{display:flex;gap:5px;}
+  .panel-head .dots span{width:8px;height:8px;border-radius:50%;background:var(--border);display:block;}
+
+  /* code panel */
+  .code-body{
+    font-family:var(--font-mono);
+    font-size:0.85rem;
+    padding:0.85rem 0;
+    overflow-x:auto;
+  }
+  .code-line{
+    display:flex;
+    padding:0.06rem 1rem;
+    white-space:pre;
+    border-left:3px solid transparent;
+    transition:background 0.25s ease, border-color 0.25s ease;
+  }
+  .code-line .ln{
+    color:var(--text-dim);
+    width:2rem;
+    flex:none;
+    user-select:none;
+    text-align:right;
+    margin-right:1rem;
+  }
+  .code-line .code{color:var(--text);}
+  .code-line.active{
+    background:rgba(242,184,75,0.09);
+    border-left-color:var(--accent-amber);
+  }
+  .code-line.active .ln{color:var(--accent-amber);}
+  .kw{color:var(--code-kw);}
+  .str{color:var(--code-str);}
+  .ty{color:var(--code-ty);}
+
+  /* right column stack */
+  .right-col{display:flex;flex-direction:column;gap:1.25rem;}
+
+  /* terminal */
+  .terminal-body{
+    background:#050705;
+    font-family:var(--font-mono);
+    font-size:0.85rem;
+    padding:1rem;
+    min-height:220px;
+    color:var(--term-fg);
+  }
+  .term-line{margin:0 0 0.15rem;white-space:pre-wrap;word-break:break-word;}
+  .term-line.gap{margin-top:0.7rem;}
+  .term-line.bright{color:var(--term-fg-bright);font-weight:500;}
+  .term-line.divider{
+    color:var(--text-dim);
+    font-family:var(--font-sans);
+    font-size:0.72rem;
+    margin:0.9rem 0 0.6rem;
+    text-align:center;
+  }
+  .term-empty{color:var(--text-dim);font-family:var(--font-sans);font-size:0.85rem;}
+  .cursor{
+    display:inline-block;
+    width:0.5em;
+    background:var(--term-fg-bright);
+    margin-left:2px;
+    animation:blink 1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+
+  .term-input-row{display:flex;align-items:center;gap:0.4rem;margin-top:0.15rem;}
+  .term-input-row input{
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--term-fg);
+    color:var(--term-fg-bright);
+    font-family:var(--font-mono);
+    font-size:0.85rem;
+    padding:0.1rem 0.2rem;
+    flex:1;
+    min-width:0;
+    outline:none;
+  }
+  .term-input-row input:focus{border-bottom-color:var(--term-fg-bright);}
+
+  /* explanation */
+  .explain-body{padding:1rem 1.1rem 1.1rem;}
+  .status-row{
+    display:flex;
+    gap:0.5rem;
+    flex-wrap:wrap;
+    margin-bottom:0.8rem;
+  }
+  .badge{
+    font-size:0.72rem;
+    padding:0.22rem 0.55rem;
+    border-radius:5px;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+  }
+  .badge.b-blue{color:var(--accent-blue);border-color:rgba(121,166,220,0.35);}
+  .badge.b-amber{color:var(--accent-amber);border-color:rgba(242,184,75,0.35);}
+  .badge.b-green{color:var(--accent-green);border-color:rgba(95,227,138,0.35);}
+
+  .explain-body h2{
+    font-size:0.98rem;
+    font-weight:600;
+    color:var(--text-bright);
+    margin:0 0 0.4rem;
+  }
+  .explain-body p{margin:0;color:var(--text);font-size:0.92rem;}
+
+  .var-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:0.5rem;
+    padding:0.85rem 1rem;
+    border-top:1px solid var(--border);
+    background:var(--panel-alt);
+  }
+  @media (max-width:520px){.var-strip{grid-template-columns:repeat(2,1fr);}}
+  .var-cell{min-width:0;}
+  .var-cell .k{
+    display:block;
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    color:var(--text-dim);
+    margin-bottom:0.15rem;
+  }
+  .var-cell .v{
+    display:block;
+    font-family:var(--font-mono);
+    font-size:0.84rem;
+    color:var(--text-bright);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .var-cell .v.empty{color:var(--text-dim);}
+
+  /* controls */
+  .controls{
+    margin-top:1.25rem;
+    display:flex;
+    align-items:center;
+    gap:0.6rem;
+    flex-wrap:wrap;
+  }
+  button{
+    font-family:var(--font-sans);
+    font-size:0.88rem;
+    font-weight:500;
+    padding:0.55rem 1.05rem;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--panel-alt);
+    color:var(--text);
+    cursor:pointer;
+    transition:border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  button:hover:not(:disabled){border-color:var(--text-dim);}
+  button:disabled{opacity:0.35;cursor:not-allowed;}
+  button.primary{
+    background:var(--accent-amber);
+    border-color:var(--accent-amber);
+    color:#1a1200;
+  }
+  button.primary:hover:not(:disabled){background:#f7c569;}
+  button.ghost{background:transparent;}
+  button.choice-j{border-color:rgba(95,227,138,0.5);color:var(--accent-green);}
+  button.choice-j:hover{background:rgba(95,227,138,0.1);}
+  button.choice-n{border-color:rgba(242,85,90,0.5);color:var(--accent-red);}
+  button.choice-n:hover{background:rgba(242,85,90,0.1);}
+  .spacer{flex:1;}
+
+  .input-inline{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;flex:1;min-width:220px;}
+  .input-inline input{
+    font-family:var(--font-mono);
+    font-size:0.88rem;
+    padding:0.5rem 0.7rem;
+    border-radius:7px;
+    border:1px solid var(--border);
+    background:var(--panel-alt);
+    color:var(--text-bright);
+    flex:1;
+    min-width:150px;
+    outline:none;
+  }
+  .input-inline input:focus{border-color:var(--accent-blue);}
+
+  footer.note{
+    margin-top:1.75rem;
+    font-size:0.82rem;
+    color:var(--text-dim);
+    max-width:70ch;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page-head">
+    <h1>Die do-while-Schleife im Detail</h1>
+    <p>Verfolge Schritt für Schritt, wie das Programm eine Adresse abfragt, anzeigt und bei Bedarf erneut abfragt &ndash; bis die Daten bestätigt werden.</p>
+  </header>
+
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-head">
+        <span>Program.cs</span>
+        <span class="dots"><span></span><span></span><span></span></span>
+      </div>
+      <div class="code-body" id="codeBody"></div>
+    </div>
+
+    <div class="right-col">
+      <div class="panel">
+        <div class="panel-head"><span>Konsole</span></div>
+        <div class="terminal-body" id="terminalBody"></div>
+        <div class="var-strip" id="varStrip"></div>
+      </div>
+
+      <div class="panel">
+        <div class="explain-body">
+          <div class="status-row" id="statusRow"></div>
+          <h2 id="explainTitle">Bereit</h2>
+          <p id="explainText">Klicke auf &bdquo;Nächster Schritt&ldquo;, um das Programm zu starten.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls" id="controls"></div>
+
+  <footer class="note">
+    Zum Vergleich: <code>do</code> lässt den Programmcode immer mindestens einmal laufen, bevor die Bedingung in <code>while (&hellip;)</code> überhaupt geprüft wird &ndash; anders als bei einer Schleife, die vorab prüft.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+  var CODE_LINES = [
+    {n:1,  html:'<span class="kw">using</span> System;'},
+    {n:2,  html:''},
+    {n:3,  html:'<span class="kw">class</span> <span class="ty">Program</span>'},
+    {n:4,  html:'{'},
+    {n:5,  html:'&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span> <span class="kw">void</span> Main()'},
+    {n:6,  html:'&nbsp;&nbsp;&nbsp;&nbsp;{'},
+    {n:7,  html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ty">string</span> name, strasse, plzStadt;'},
+    {n:8,  html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ty">string</span> eingabe;'},
+    {n:9,  html:''},
+    {n:10, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">do</span>'},
+    {n:11, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'},
+    {n:12, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"Name: "</span>);'},
+    {n:13, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = Console.ReadLine();'},
+    {n:14, html:''},
+    {n:15, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"Straße: "</span>);'},
+    {n:16, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;strasse = Console.ReadLine();'},
+    {n:17, html:''},
+    {n:18, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"PLZ und Stadt: "</span>);'},
+    {n:19, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plzStadt = Console.ReadLine();'},
+    {n:20, html:''},
+    {n:21, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"\\nEingegebene Daten:"</span>);'},
+    {n:22, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"Name: "</span> + name);'},
+    {n:23, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"Straße + Hausnummer: "</span> + strasse);'},
+    {n:24, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"PLZ + Stadt: "</span> + plzStadt);'},
+    {n:25, html:''},
+    {n:26, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"\\nSind die Daten korrekt? (J/N): "</span>);'},
+    {n:27, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;eingabe = Console.ReadLine().ToUpper();'},
+    {n:28, html:''},
+    {n:29, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <span class="kw">while</span> (eingabe != <span class="str">"J"</span>);'},
+    {n:30, html:''},
+    {n:31, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"\\nDaten bestätigt. Programm beendet."</span>);'},
+    {n:32, html:'&nbsp;&nbsp;&nbsp;&nbsp;}'},
+    {n:33, html:'}'}
+  ];
+
+  var codeBody = document.getElementById('codeBody');
+  CODE_LINES.forEach(function(l){
+    var div = document.createElement('div');
+    div.className = 'code-line';
+    div.dataset.line = l.n;
+    div.innerHTML = '<span class="ln">' + l.n + '</span><span class="code">' + (l.html || '&nbsp;') + '</span>';
+    codeBody.appendChild(div);
+  });
+
+  var PHASE_META = {
+    ready:  {highlight:[], title:'Bereit', text:'Klicke auf „Nächster Schritt“, um das Programm zu starten.'},
+    0:      {highlight:[10,11], title:'Schleife wird betreten', text:'Der Programmablauf erreicht den Schleifenkopf. Bei einer do-while-Schleife wird der Rumpf jetzt ausgeführt, ohne vorher irgendetwas zu prüfen.'},
+    1:      {highlight:[12,13], title:'Name eingeben', text:'Console.Write gibt den Text „Name: “ aus, danach wartet Console.ReadLine() auf eine Eingabe.'},
+    2:      {highlight:[15,16], title:'Straße eingeben', text:'Genauso wird jetzt nach der Straße gefragt und die Eingabe in der Variable strasse gespeichert.'},
+    3:      {highlight:[18,19], title:'PLZ und Stadt eingeben', text:'Zuletzt wird PLZ und Stadt abgefragt und in plzStadt gespeichert.'},
+    4:      {highlight:[21], title:'Zwischenüberschrift ausgeben', text:'Console.WriteLine gibt die Überschrift „Eingegebene Daten:“ aus.'},
+    5:      {highlight:[22,23,24], title:'Eingaben werden angezeigt', text:'Die drei gespeicherten Variablen werden zur Kontrolle auf der Konsole ausgegeben.'},
+    6:      {highlight:[26,27], title:'Bestätigung abfragen', text:'Das Programm fragt, ob die Daten korrekt sind, und speichert die Antwort (in Großbuchstaben) in der Variable eingabe.'},
+    7:      {highlight:[29], title:'Bedingung wird geprüft', text:''},
+    8:      {highlight:[31], title:'Schleife beendet', text:'Die Bedingung ist jetzt falsch, die Schleife wird verlassen. Das Programm gibt die Abschlussmeldung aus und endet.'}
+  };
+
+  function cloneValues(v){ return {name:v.name, strasse:v.strasse, plzStadt:v.plzStadt, eingabe:v.eingabe}; }
+  function cloneTerm(t){ return t.slice(); }
+
+  function initialState(){
+    return {
+      iteration:1,
+      phase:'ready',
+      values:{name:'',strasse:'',plzStadt:'',eingabe:''},
+      terminal:[],
+      finished:false,
+      conditionResult:null
+    };
+  }
+
+  var history = [initialState()];
+  var pointer = 0;
+
+  function current(){ return history[pointer]; }
+
+  function pushState(next){
+    history = history.slice(0, pointer+1);
+    history.push(next);
+    pointer = history.length - 1;
+    render();
+  }
+
+  function goBack(){
+    if(pointer>0){ pointer--; render(); }
+  }
+
+  function goRestart(){
+    history = [initialState()];
+    pointer = 0;
+    render();
+  }
+
+  function advanceAuto(){
+    var st = current();
+    var next;
+    if(st.phase==='ready'){
+      next = {iteration:1, phase:0, values:cloneValues(st.values), terminal:cloneTerm(st.terminal), finished:false, conditionResult:null};
+    } else if(st.phase===0){
+      next = {iteration:st.iteration, phase:1, values:cloneValues(st.values), terminal:cloneTerm(st.terminal), finished:false, conditionResult:null};
+    } else if(st.phase===4){
+      var t = cloneTerm(st.terminal);
+      t.push({cls:'gap', text:'Eingegebene Daten:'});
+      next = {iteration:st.iteration, phase:5, values:cloneValues(st.values), terminal:t, finished:false, conditionResult:null};
+    } else if(st.phase===5){
+      var t2 = cloneTerm(st.terminal);
+      t2.push({cls:'', text:'Name: ' + st.values.name});
+      t2.push({cls:'', text:'Straße + Hausnummer: ' + st.values.strasse});
+      t2.push({cls:'', text:'PLZ + Stadt: ' + st.values.plzStadt});
+      next = {iteration:st.iteration, phase:6, values:cloneValues(st.values), terminal:t2, finished:false, conditionResult:null};
+    } else if(st.phase===7){
+      var loopsAgain = st.conditionResult;
+      if(loopsAgain){
+        var t3 = cloneTerm(st.terminal);
+        t3.push({cls:'divider', text:'— Durchlauf ' + (st.iteration+1) + ' —'});
+        next = {iteration:st.iteration+1, phase:0, values:{name:'',strasse:'',plzStadt:'',eingabe:''}, terminal:t3, finished:false, conditionResult:null};
+      } else {
+        var t4 = cloneTerm(st.terminal);
+        t4.push({cls:'gap bright', text:'Daten bestätigt. Programm beendet.'});
+        next = {iteration:st.iteration, phase:8, values:cloneValues(st.values), terminal:t4, finished:true, conditionResult:null};
+      }
+    }
+    if(next){ pushState(next); }
+  }
+
+  function submitText(field, label){
+    var st = current();
+    var input = document.getElementById('fieldInput');
+    var val = (input && input.value.trim()) ? input.value.trim() : (input ? input.placeholder : '');
+    var vals = cloneValues(st.values);
+    vals[field] = val;
+    var t = cloneTerm(st.terminal);
+    t.push({cls: st.phase===1 ? 'gap' : '', text: label + ': ' + val});
+    var nextPhase = st.phase + 1;
+    var next = {iteration:st.iteration, phase:nextPhase, values:vals, terminal:t, finished:false, conditionResult:null};
+    pushState(next);
+  }
+
+  function submitChoice(choice){
+    var st = current();
+    var vals = cloneValues(st.values);
+    vals.eingabe = choice;
+    var t = cloneTerm(st.terminal);
+    t.push({cls:'gap', text:'Sind die Daten korrekt? (J/N): ' + choice});
+    var next = {iteration:st.iteration, phase:7, values:vals, terminal:t, finished:false, conditionResult:(choice !== 'J')};
+    pushState(next);
+  }
+
+  function render(){
+    var st = current();
+
+    // code highlighting
+    var meta = PHASE_META[st.phase];
+    var hl = meta ? meta.highlight : [];
+    document.querySelectorAll('.code-line').forEach(function(div){
+      var ln = parseInt(div.dataset.line, 10);
+      div.classList.toggle('active', hl.indexOf(ln) !== -1);
+    });
+    var firstActive = codeBody.querySelector('.code-line.active');
+    if(firstActive){ firstActive.scrollIntoView({block:'nearest'}); }
+
+    // terminal
+    var term = document.getElementById('terminalBody');
+    term.innerHTML = '';
+    if(st.terminal.length===0){
+      var empty = document.createElement('div');
+      empty.className = 'term-empty';
+      empty.textContent = 'Noch keine Ausgabe.';
+      term.appendChild(empty);
+    } else {
+      st.terminal.forEach(function(line){
+        var d = document.createElement('div');
+        d.className = 'term-line ' + (line.cls||'');
+        d.textContent = line.text;
+        term.appendChild(d);
+      });
+    }
+    var awaitingText = (st.phase===1||st.phase===2||st.phase===3);
+    var awaitingChoice = (st.phase===6);
+    if(awaitingText || awaitingChoice){
+      var promptLabel = st.phase===1 ? 'Name' : st.phase===2 ? 'Straße' : st.phase===3 ? 'PLZ und Stadt' : 'Sind die Daten korrekt? (J/N)';
+      var row = document.createElement('div');
+      row.className = 'term-input-row';
+      if(awaitingText){
+        row.innerHTML = '<span>' + promptLabel + ': </span><input id="fieldInput" type="text" autocomplete="off" placeholder="' + (st.phase===1?'Max Mustermann':st.phase===2?'Musterstraße 12':'12345 Musterstadt') + '"><span class="cursor"></span>';
+      } else {
+        row.innerHTML = '<span>' + promptLabel + ': </span><span class="cursor"></span>';
+      }
+      term.appendChild(row);
+      if(awaitingText){
+        var inp = document.getElementById('fieldInput');
+        inp.addEventListener('keydown', function(e){ if(e.key==='Enter'){ handleFieldSubmit(); } });
+        setTimeout(function(){ inp.focus(); }, 0);
+      }
+    }
+    term.scrollTop = term.scrollHeight;
+
+    // variables
+    var varStrip = document.getElementById('varStrip');
+    var vars = [
+      {k:'name', v:st.values.name},
+      {k:'strasse', v:st.values.strasse},
+      {k:'plzStadt', v:st.values.plzStadt},
+      {k:'eingabe', v:st.values.eingabe}
+    ];
+    varStrip.innerHTML = '';
+    vars.forEach(function(item){
+      var cell = document.createElement('div');
+      cell.className = 'var-cell';
+      cell.innerHTML = '<span class="k">' + item.k + '</span><span class="v ' + (item.v?'':'empty') + '">' + (item.v ? item.v : '(leer)') + '</span>';
+      varStrip.appendChild(cell);
+    });
+
+    // status badges
+    var statusRow = document.getElementById('statusRow');
+    statusRow.innerHTML = '';
+    var b1 = document.createElement('span');
+    b1.className = 'badge b-blue';
+    b1.textContent = 'Durchlauf ' + st.iteration;
+    statusRow.appendChild(b1);
+    var b2 = document.createElement('span');
+    if(st.finished){
+      b2.className = 'badge b-green';
+      b2.textContent = 'beendet';
+    } else {
+      b2.className = 'badge b-amber';
+      b2.textContent = 'läuft';
+    }
+    statusRow.appendChild(b2);
+
+    // explanation text
+    var title = document.getElementById('explainTitle');
+    var text = document.getElementById('explainText');
+    if(st.phase===7){
+      title.textContent = 'Bedingung wird geprüft: eingabe != "J"';
+      if(st.conditionResult===true){
+        text.textContent = 'Aktueller Wert von eingabe ist "' + st.values.eingabe + '". Das ist ungleich "J", die Bedingung ist also wahr — die Schleife wird erneut durchlaufen.';
+      } else if(st.conditionResult===false){
+        text.textContent = 'Aktueller Wert von eingabe ist "J". Die Bedingung eingabe != "J" ist also falsch — die Schleife wird beendet.';
+      } else {
+        text.textContent = 'Der Wert von eingabe wird jetzt mit "J" verglichen.';
+      }
+    } else {
+      title.textContent = meta.title;
+      text.textContent = meta.text;
+    }
+
+    renderControls(st);
+  }
+
+  function handleFieldSubmit(){
+    var st = current();
+    var field = st.phase===1 ? 'name' : st.phase===2 ? 'strasse' : 'plzStadt';
+    var label = st.phase===1 ? 'Name' : st.phase===2 ? 'Straße' : 'PLZ und Stadt';
+    submitText(field, label);
+  }
+
+  function renderControls(st){
+    var controls = document.getElementById('controls');
+    controls.innerHTML = '';
+
+    var backBtn = document.createElement('button');
+    backBtn.textContent = 'Zurück';
+    backBtn.disabled = pointer===0;
+    backBtn.addEventListener('click', goBack);
+    controls.appendChild(backBtn);
+
+    if(st.phase===1 || st.phase===2 || st.phase===3){
+      var hint = document.createElement('span');
+      hint.className = 'badge';
+      hint.textContent = 'Eingabe in der Konsole rechts, dann bestätigen';
+      controls.appendChild(hint);
+      var spacer = document.createElement('div');
+      spacer.className = 'spacer';
+      controls.appendChild(spacer);
+      var submitBtn = document.createElement('button');
+      submitBtn.className = 'primary';
+      submitBtn.textContent = 'Bestätigen';
+      submitBtn.addEventListener('click', handleFieldSubmit);
+      controls.appendChild(submitBtn);
+    } else if(st.phase===6){
+      var spacer2 = document.createElement('div');
+      spacer2.className = 'spacer';
+      controls.appendChild(spacer2);
+      var jBtn = document.createElement('button');
+      jBtn.className = 'choice-j';
+      jBtn.textContent = 'J — Daten korrekt';
+      jBtn.addEventListener('click', function(){ submitChoice('J'); });
+      controls.appendChild(jBtn);
+      var nBtn = document.createElement('button');
+      nBtn.className = 'choice-n';
+      nBtn.textContent = 'N — Daten fehlerhaft';
+      nBtn.addEventListener('click', function(){ submitChoice('N'); });
+      controls.appendChild(nBtn);
+    } else if(st.phase===8){
+      var spacer3 = document.createElement('div');
+      spacer3.className = 'spacer';
+      controls.appendChild(spacer3);
+      var doneLabel = document.createElement('span');
+      doneLabel.className = 'badge b-green';
+      doneLabel.textContent = 'Programm beendet';
+      controls.appendChild(doneLabel);
+    } else {
+      var spacer4 = document.createElement('div');
+      spacer4.className = 'spacer';
+      controls.appendChild(spacer4);
+      var nextBtn = document.createElement('button');
+      nextBtn.className = 'primary';
+      nextBtn.textContent = 'Nächster Schritt';
+      nextBtn.addEventListener('click', advanceAuto);
+      controls.appendChild(nextBtn);
+    }
+
+    var restartBtn = document.createElement('button');
+    restartBtn.className = 'ghost';
+    restartBtn.textContent = 'Neustart';
+    restartBtn.addEventListener('click', goRestart);
+    controls.appendChild(restartBtn);
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
