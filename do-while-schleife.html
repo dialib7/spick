@@ -58,11 +58,12 @@
     display:grid;
     grid-template-columns:1.15fr 1fr;
     gap:1.25rem;
-    align-items:start;
+    align-items:stretch;
   }
   @media (max-width:900px){
     .main-grid{grid-template-columns:1fr;}
   }
+  .code-panel-wrap{display:flex;flex-direction:column;}
 
   .panel{
     background:var(--panel);
@@ -88,6 +89,8 @@
     font-size:0.85rem;
     padding:0.85rem 0;
     overflow-x:auto;
+    overflow-y:auto;
+    flex:1;
   }
   .code-line{
     display:flex;
@@ -218,11 +221,19 @@
 
   /* controls */
   .controls{
-    margin-top:1.25rem;
+    display:flex;
+    flex-direction:column;
+    gap:0.5rem;
+  }
+  .controls-row{
     display:flex;
     align-items:center;
     gap:0.6rem;
     flex-wrap:wrap;
+  }
+  .controls-hint{
+    font-size:0.78rem;
+    color:var(--text-dim);
   }
   button{
     font-family:var(--font-sans);
@@ -266,7 +277,7 @@
   }
   .input-inline input:focus{border-color:var(--accent-blue);}
 
-  footer.note{
+  div.note{
     margin-top:1.75rem;
     font-size:0.82rem;
     color:var(--text-dim);
@@ -283,9 +294,9 @@
   </header>
 
   <div class="main-grid">
-    <div class="panel">
+    <div class="panel code-panel-wrap">
       <div class="panel-head">
-        <span>Program.cs</span>
+        <span>Program.cs — Main()</span>
         <span class="dots"><span></span><span></span><span></span></span>
       </div>
       <div class="code-body" id="codeBody"></div>
@@ -305,14 +316,14 @@
           <p id="explainText">Klicke auf &bdquo;Nächster Schritt&ldquo;, um das Programm zu starten.</p>
         </div>
       </div>
+
+      <div class="controls" id="controls"></div>
+
+      <div class="note">
+        Zum Vergleich: <code>do</code> lässt den Programmcode immer mindestens einmal laufen, bevor die Bedingung in <code>while (&hellip;)</code> überhaupt geprüft wird &ndash; anders als bei einer Schleife, die vorab prüft.
+      </div>
     </div>
   </div>
-
-  <div class="controls" id="controls"></div>
-
-  <footer class="note">
-    Zum Vergleich: <code>do</code> lässt den Programmcode immer mindestens einmal laufen, bevor die Bedingung in <code>while (&hellip;)</code> überhaupt geprüft wird &ndash; anders als bei einer Schleife, die vorab prüft.
-  </footer>
 
 </div>
 
@@ -320,39 +331,34 @@
 (function(){
 
   var CODE_LINES = [
-    {n:1,  html:'<span class="kw">using</span> System;'},
-    {n:2,  html:''},
-    {n:3,  html:'<span class="kw">class</span> <span class="ty">Program</span>'},
-    {n:4,  html:'{'},
-    {n:5,  html:'&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">static</span> <span class="kw">void</span> Main()'},
-    {n:6,  html:'&nbsp;&nbsp;&nbsp;&nbsp;{'},
-    {n:7,  html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ty">string</span> name, strasse, plzStadt;'},
-    {n:8,  html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="ty">string</span> eingabe;'},
-    {n:9,  html:''},
-    {n:10, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">do</span>'},
-    {n:11, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{'},
-    {n:12, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"Name: "</span>);'},
-    {n:13, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = Console.ReadLine();'},
-    {n:14, html:''},
-    {n:15, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"Straße: "</span>);'},
-    {n:16, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;strasse = Console.ReadLine();'},
-    {n:17, html:''},
-    {n:18, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"PLZ und Stadt: "</span>);'},
-    {n:19, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plzStadt = Console.ReadLine();'},
-    {n:20, html:''},
-    {n:21, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"\\nEingegebene Daten:"</span>);'},
-    {n:22, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"Name: "</span> + name);'},
-    {n:23, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"Straße + Hausnummer: "</span> + strasse);'},
-    {n:24, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"PLZ + Stadt: "</span> + plzStadt);'},
-    {n:25, html:''},
-    {n:26, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"\\nSind die Daten korrekt? (J/N): "</span>);'},
-    {n:27, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;eingabe = Console.ReadLine().ToUpper();'},
-    {n:28, html:''},
-    {n:29, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;} <span class="kw">while</span> (eingabe != <span class="str">"J"</span>);'},
-    {n:30, html:''},
-    {n:31, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"\\nDaten bestätigt. Programm beendet."</span>);'},
-    {n:32, html:'&nbsp;&nbsp;&nbsp;&nbsp;}'},
-    {n:33, html:'}'}
+    {n:1,  html:'<span class="kw">static</span> <span class="kw">void</span> Main()'},
+    {n:2,  html:'{'},
+    {n:3,  html:'&nbsp;&nbsp;&nbsp;&nbsp;<span class="ty">string</span> name, strasse, plzStadt;'},
+    {n:4,  html:'&nbsp;&nbsp;&nbsp;&nbsp;<span class="ty">string</span> eingabe;'},
+    {n:5,  html:''},
+    {n:6,  html:'&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">do</span>'},
+    {n:7,  html:'&nbsp;&nbsp;&nbsp;&nbsp;{'},
+    {n:8,  html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"Name: "</span>);'},
+    {n:9,  html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name = Console.ReadLine();'},
+    {n:10, html:''},
+    {n:11, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"Straße: "</span>);'},
+    {n:12, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;strasse = Console.ReadLine();'},
+    {n:13, html:''},
+    {n:14, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"PLZ und Stadt: "</span>);'},
+    {n:15, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;plzStadt = Console.ReadLine();'},
+    {n:16, html:''},
+    {n:17, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"\\nEingegebene Daten:"</span>);'},
+    {n:18, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"Name: "</span> + name);'},
+    {n:19, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"Straße + Hausnummer: "</span> + strasse);'},
+    {n:20, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"PLZ + Stadt: "</span> + plzStadt);'},
+    {n:21, html:''},
+    {n:22, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Console.Write(<span class="str">"\\nSind die Daten korrekt? (J/N): "</span>);'},
+    {n:23, html:'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;eingabe = Console.ReadLine().ToUpper();'},
+    {n:24, html:''},
+    {n:25, html:'&nbsp;&nbsp;&nbsp;&nbsp;} <span class="kw">while</span> (eingabe != <span class="str">"J"</span>);'},
+    {n:26, html:''},
+    {n:27, html:'&nbsp;&nbsp;&nbsp;&nbsp;Console.WriteLine(<span class="str">"\\nDaten bestätigt. Programm beendet."</span>);'},
+    {n:28, html:'}'}
   ];
 
   var codeBody = document.getElementById('codeBody');
@@ -366,15 +372,15 @@
 
   var PHASE_META = {
     ready:  {highlight:[], title:'Bereit', text:'Klicke auf „Nächster Schritt“, um das Programm zu starten.'},
-    0:      {highlight:[10,11], title:'Schleife wird betreten', text:'Der Programmablauf erreicht den Schleifenkopf. Bei einer do-while-Schleife wird der Rumpf jetzt ausgeführt, ohne vorher irgendetwas zu prüfen.'},
-    1:      {highlight:[12,13], title:'Name eingeben', text:'Console.Write gibt den Text „Name: “ aus, danach wartet Console.ReadLine() auf eine Eingabe.'},
-    2:      {highlight:[15,16], title:'Straße eingeben', text:'Genauso wird jetzt nach der Straße gefragt und die Eingabe in der Variable strasse gespeichert.'},
-    3:      {highlight:[18,19], title:'PLZ und Stadt eingeben', text:'Zuletzt wird PLZ und Stadt abgefragt und in plzStadt gespeichert.'},
-    4:      {highlight:[21], title:'Zwischenüberschrift ausgeben', text:'Console.WriteLine gibt die Überschrift „Eingegebene Daten:“ aus.'},
-    5:      {highlight:[22,23,24], title:'Eingaben werden angezeigt', text:'Die drei gespeicherten Variablen werden zur Kontrolle auf der Konsole ausgegeben.'},
-    6:      {highlight:[26,27], title:'Bestätigung abfragen', text:'Das Programm fragt, ob die Daten korrekt sind, und speichert die Antwort (in Großbuchstaben) in der Variable eingabe.'},
-    7:      {highlight:[29], title:'Bedingung wird geprüft', text:''},
-    8:      {highlight:[31], title:'Schleife beendet', text:'Die Bedingung ist jetzt falsch, die Schleife wird verlassen. Das Programm gibt die Abschlussmeldung aus und endet.'}
+    0:      {highlight:[6,7], title:'Schleife wird betreten', text:'Der Programmablauf erreicht den Schleifenkopf. Bei einer do-while-Schleife wird der Rumpf jetzt ausgeführt, ohne vorher irgendetwas zu prüfen.'},
+    1:      {highlight:[8,9], title:'Name eingeben', text:'Console.Write gibt den Text „Name: “ aus, danach wartet Console.ReadLine() auf eine Eingabe.'},
+    2:      {highlight:[11,12], title:'Straße eingeben', text:'Genauso wird jetzt nach der Straße gefragt und die Eingabe in der Variable strasse gespeichert.'},
+    3:      {highlight:[14,15], title:'PLZ und Stadt eingeben', text:'Zuletzt wird PLZ und Stadt abgefragt und in plzStadt gespeichert.'},
+    4:      {highlight:[17], title:'Zwischenüberschrift ausgeben', text:'Console.WriteLine gibt die Überschrift „Eingegebene Daten:“ aus.'},
+    5:      {highlight:[18,19,20], title:'Eingaben werden angezeigt', text:'Die drei gespeicherten Variablen werden zur Kontrolle auf der Konsole ausgegeben.'},
+    6:      {highlight:[22,23], title:'Bestätigung abfragen', text:'Das Programm fragt, ob die Daten korrekt sind, und speichert die Antwort (in Großbuchstaben) in der Variable eingabe.'},
+    7:      {highlight:[25], title:'Bedingung wird geprüft', text:''},
+    8:      {highlight:[27], title:'Schleife beendet', text:'Die Bedingung ist jetzt falsch, die Schleife wird verlassen. Das Programm gibt die Abschlussmeldung aus und endet.'}
   };
 
   function cloneValues(v){ return {name:v.name, strasse:v.strasse, plzStadt:v.plzStadt, eingabe:v.eingabe}; }
@@ -448,7 +454,7 @@
   function submitText(field, label){
     var st = current();
     var input = document.getElementById('fieldInput');
-    var val = (input && input.value.trim()) ? input.value.trim() : (input ? input.placeholder : '');
+    var val = input ? input.value : '';
     var vals = cloneValues(st.values);
     vals[field] = val;
     var t = cloneTerm(st.terminal);
@@ -581,63 +587,74 @@
     var controls = document.getElementById('controls');
     controls.innerHTML = '';
 
+    var row = document.createElement('div');
+    row.className = 'controls-row';
+
     var backBtn = document.createElement('button');
     backBtn.textContent = 'Zurück';
     backBtn.disabled = pointer===0;
     backBtn.addEventListener('click', goBack);
-    controls.appendChild(backBtn);
+    row.appendChild(backBtn);
+
+    var hintText = '';
 
     if(st.phase===1 || st.phase===2 || st.phase===3){
-      var hint = document.createElement('span');
-      hint.className = 'badge';
-      hint.textContent = 'Eingabe in der Konsole rechts, dann bestätigen';
-      controls.appendChild(hint);
+      hintText = 'Eingabe in der Konsole rechts, dann bestätigen.';
       var spacer = document.createElement('div');
       spacer.className = 'spacer';
-      controls.appendChild(spacer);
+      row.appendChild(spacer);
       var submitBtn = document.createElement('button');
       submitBtn.className = 'primary';
       submitBtn.textContent = 'Bestätigen';
       submitBtn.addEventListener('click', handleFieldSubmit);
-      controls.appendChild(submitBtn);
+      row.appendChild(submitBtn);
     } else if(st.phase===6){
       var spacer2 = document.createElement('div');
       spacer2.className = 'spacer';
-      controls.appendChild(spacer2);
+      row.appendChild(spacer2);
       var jBtn = document.createElement('button');
       jBtn.className = 'choice-j';
       jBtn.textContent = 'J — Daten korrekt';
       jBtn.addEventListener('click', function(){ submitChoice('J'); });
-      controls.appendChild(jBtn);
+      row.appendChild(jBtn);
       var nBtn = document.createElement('button');
       nBtn.className = 'choice-n';
       nBtn.textContent = 'N — Daten fehlerhaft';
       nBtn.addEventListener('click', function(){ submitChoice('N'); });
-      controls.appendChild(nBtn);
+      row.appendChild(nBtn);
     } else if(st.phase===8){
       var spacer3 = document.createElement('div');
       spacer3.className = 'spacer';
-      controls.appendChild(spacer3);
+      row.appendChild(spacer3);
       var doneLabel = document.createElement('span');
       doneLabel.className = 'badge b-green';
       doneLabel.textContent = 'Programm beendet';
-      controls.appendChild(doneLabel);
+      row.appendChild(doneLabel);
     } else {
       var spacer4 = document.createElement('div');
       spacer4.className = 'spacer';
-      controls.appendChild(spacer4);
+      row.appendChild(spacer4);
       var nextBtn = document.createElement('button');
       nextBtn.className = 'primary';
       nextBtn.textContent = 'Nächster Schritt';
       nextBtn.addEventListener('click', advanceAuto);
-      controls.appendChild(nextBtn);
+      row.appendChild(nextBtn);
     }
 
     var restartBtn = document.createElement('button');
     restartBtn.className = 'ghost';
     restartBtn.textContent = 'Neustart';
     restartBtn.addEventListener('click', goRestart);
-    controls.appendChild(restartBtn);
+    row.appendChild(restartBtn);
+
+    controls.appendChild(row);
+
+    if(hintText){
+      var hint = document.createElement('div');
+      hint.className = 'controls-hint';
+      hint.textContent = hintText;
+      controls.appendChild(hint);
+    }
   }
 
   render();
