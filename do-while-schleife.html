@@ -456,7 +456,7 @@
     var input = document.getElementById('fieldInput');
     var val = input ? input.value : '';
     var vals = cloneValues(st.values);
-    vals[field] = val;
+    vals[field] = val ? val : '""';
     var t = cloneTerm(st.terminal);
     t.push({cls: st.phase===1 ? 'gap' : '', text: label + ': ' + val});
     var nextPhase = st.phase + 1;
@@ -535,7 +535,7 @@
     vars.forEach(function(item){
       var cell = document.createElement('div');
       cell.className = 'var-cell';
-      cell.innerHTML = '<span class="k">' + item.k + '</span><span class="v ' + (item.v?'':'empty') + '">' + (item.v ? item.v : '(leer)') + '</span>';
+      cell.innerHTML = '<span class="k">' + item.k + '</span><span class="v ' + (item.v?'':'empty') + '">' + (item.v ? (item.v == '""') ? item.v : '"' + item.v + '"' : '(leer)') + '</span>';
       varStrip.appendChild(cell);
     });
 
