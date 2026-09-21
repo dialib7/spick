@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pixel-Art Generator 8x8</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+<style>
+  :root{
+    --bg: #f5f5f7;
+    --card-bg: #ffffff;
+    --grid-border: #dbdbdb;
+    --cell-size: 48px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg: #16181d;
+      --card-bg: #21242b;
+      --grid-border: #3a3d46;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg: #16181d;
+    --card-bg: #21242b;
+    --grid-border: #3a3d46;
+  }
+  html, body{
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: var(--bg);
+    min-height: 100%;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #2c2c2c;
+  }
+  :root[data-theme="dark"] body, @media (prefers-color-scheme: dark){ body{ color: #eee; } }
+
+  .app-card{
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .app-title{
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+
+  .palette-section{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    align-items: flex-start;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .swatch-grid{
+    display: grid;
+    grid-template-columns: repeat(8, 32px);
+    gap: 6px;
+  }
+
+  .swatch{
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 2px solid rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    padding: 0;
+  }
+  .swatch:hover{ transform: scale(1.1); }
+  .swatch.selected{
+    border-color: #2c2c2c;
+    box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #2c2c2c;
+  }
+  :root[data-theme="dark"] .swatch.selected{
+    box-shadow: 0 0 0 2px #21242b, 0 0 0 4px #eee;
+  }
+
+  .custom-color-block{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .custom-color-block input[type="color"]{
+    width: 56px;
+    height: 40px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    background: none;
+    padding: 0;
+  }
+
+  .current-color-preview{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.85rem;
+  }
+  .current-color-swatch{
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    border: 2px solid rgba(0,0,0,0.15);
+  }
+
+  .grid-wrapper{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.75rem;
+    overflow-x: auto;
+  }
+
+  .pixel-grid{
+    display: grid;
+    grid-template-columns: repeat(8, var(--cell-size));
+    grid-template-rows: repeat(8, var(--cell-size));
+    border: 2px solid var(--grid-border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .pixel-cell{
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 1px solid var(--grid-border);
+    cursor: pointer;
+    padding: 0;
+    background-color: transparent;
+  }
+  .pixel-cell.is-empty{
+    background-color: #f0f0f0;
+  }
+
+  .action-buttons{
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 480px){
+    :root{ --cell-size: 34px; }
+    .swatch-grid{ grid-template-columns: repeat(8, 26px); }
+    .swatch{ width: 26px; height: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<section class="section">
+  <div class="app-card">
+    <h1 class="title is-4 app-title">🎨 Pixel-Art Generator 8×8</h1>
+
+    <div class="palette-section">
+      <div>
+        <p class="has-text-weight-semibold has-text-centered mb-2" style="font-size:0.8rem;">Direktfarben</p>
+        <div class="swatch-grid" id="swatchGrid"></div>
+      </div>
+      <div class="custom-color-block">
+        <p class="has-text-weight-semibold" style="font-size:0.8rem;">Eigene Farbe</p>
+        <input type="color" id="customColor" value="#ffffff">
+      </div>
+      <div class="custom-color-block">
+        <p class="has-text-weight-semibold" style="font-size:0.8rem;">Radiergummi</p>
+        <button class="swatch is-empty" id="eraserBtn" title="transparent" style="width:40px;height:40px;"></button>
+      </div>
+    </div>
+
+    <div class="current-color-preview">
+      <span>Aktive Farbe:</span>
+      <span class="current-color-swatch" id="currentColorSwatch"></span>
+      <span id="currentColorLabel" class="has-text-weight-semibold"></span>
+    </div>
+
+    <div class="grid-wrapper">
+      <div class="pixel-grid" id="pixelGrid"></div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="button is-light" id="resetBtn">Gitter zurücksetzen</button>
+      <button class="button is-primary" id="exportBtn">Als PNG speichern</button>
+    </div>
+  </div>
+</section>
+
+<canvas id="exportCanvas" style="display:none;"></canvas>
+
+<script>
+  const DIRECT_COLORS = [
+    "#000000", "#ffffff", "#c0392b", "#e74c3c",
+    "#e67e22", "#f1c40f", "#2ecc71", "#27ae60",
+    "#1abc9c", "#3498db", "#2980b9", "#9b59b6",
+    "#8e44ad", "#34495e", "#7f8c8d", "#ecf0f1"
+  ];
+
+  let currentColor = DIRECT_COLORS[0];
+  const gridSize = 8;
+  const pixelData = new Array(gridSize * gridSize).fill("transparent");
+
+  const swatchGrid = document.getElementById("swatchGrid");
+  const pixelGrid = document.getElementById("pixelGrid");
+  const customColorInput = document.getElementById("customColor");
+  const currentColorSwatch = document.getElementById("currentColorSwatch");
+  const currentColorLabel = document.getElementById("currentColorLabel");
+  const resetBtn = document.getElementById("resetBtn");
+  const exportBtn = document.getElementById("exportBtn");
+  const exportCanvas = document.getElementById("exportCanvas");
+  const eraserBtn = document.getElementById("eraserBtn");
+
+  function updateCurrentColorDisplay(){
+    if (currentColor === "transparent"){
+      currentColorSwatch.style.backgroundColor = "transparent";
+      currentColorSwatch.classList.add("is-empty");
+      currentColorLabel.textContent = "transparent";
+    } else {
+      currentColorSwatch.classList.remove("is-empty");
+      currentColorSwatch.style.backgroundColor = currentColor;
+      currentColorLabel.textContent = currentColor;
+    }
+  }
+
+  function paintCell(cell, color){
+    if (color === "transparent"){
+      cell.classList.add("is-empty");
+      cell.style.backgroundColor = "";
+    } else {
+      cell.classList.remove("is-empty");
+      cell.style.backgroundColor = color;
+    }
+  }
+
+  function setCurrentColor(color, swatchEl){
+    currentColor = color;
+    document.querySelectorAll(".swatch").forEach(s => s.classList.remove("selected"));
+    if (swatchEl) swatchEl.classList.add("selected");
+    updateCurrentColorDisplay();
+  }
+
+  DIRECT_COLORS.forEach((color, i) => {
+    const btn = document.createElement("button");
+    btn.className = "swatch";
+    btn.style.backgroundColor = color;
+    btn.title = color;
+    btn.addEventListener("click", () => setCurrentColor(color, btn));
+    if (i === 0) btn.classList.add("selected");
+    swatchGrid.appendChild(btn);
+  });
+
+  customColorInput.addEventListener("input", () => {
+    setCurrentColor(customColorInput.value, null);
+  });
+
+  eraserBtn.addEventListener("click", () => {
+    setCurrentColor("transparent", null);
+  });
+
+  for (let i = 0; i < gridSize * gridSize; i++){
+    const cell = document.createElement("button");
+    cell.className = "pixel-cell";
+    cell.dataset.index = i;
+    paintCell(cell, pixelData[i]);
+    cell.addEventListener("click", () => {
+      pixelData[i] = currentColor;
+      paintCell(cell, currentColor);
+    });
+    pixelGrid.appendChild(cell);
+  }
+
+  resetBtn.addEventListener("click", () => {
+    for (let i = 0; i < pixelData.length; i++){
+      pixelData[i] = "transparent";
+    }
+    document.querySelectorAll(".pixel-cell").forEach(cell => {
+      paintCell(cell, "transparent");
+    });
+  });
+
+  exportBtn.addEventListener("click", () => {
+    const scale = 32;
+    exportCanvas.width = gridSize * scale;
+    exportCanvas.height = gridSize * scale;
+    const ctx = exportCanvas.getContext("2d");
+    ctx.clearRect(0, 0, exportCanvas.width, exportCanvas.height);
+    for (let row = 0; row < gridSize; row++){
+      for (let col = 0; col < gridSize; col++){
+        const idx = row * gridSize + col;
+        const color = pixelData[idx];
+        if (color === "transparent") continue;
+        ctx.fillStyle = color;
+        ctx.fillRect(col * scale, row * scale, scale, scale);
+      }
+    }
+    exportCanvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = "pixel-art-8x8.png";
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }, "image/png");
+  });
+
+  updateCurrentColorDisplay();
+</script>
+
+</body>
+</html>
