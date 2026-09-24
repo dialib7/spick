@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HTML-Struktur-Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#1b1e27; --panel:#242833; --panel2:#2c313e; --line:#3a4152;
+  --text:#e7e9ee; --muted:#8b93a7;
+  --tag:#7cc5f7; --tagclose:#6fa8c9; --textnode:#f2c879; --brace:#8b93a7;
+  --ok:#4fd699; --err:#ef6d6d;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:'JetBrains Mono', ui-monospace, monospace;
+  min-height:100%; padding:20px;
+}
+
+h1{
+  font-size:1.15rem; font-weight:600; margin:0 0 4px; letter-spacing:.2px;
+}
+.sub{color:var(--muted); font-size:.85rem; margin:0 0 18px; line-height:1.5;}
+.layout{
+  display:grid; grid-template-columns: minmax(0,1.3fr) minmax(0,1fr);
+  gap:16px; align-items:start;
+}
+@media (max-width: 760px){ .layout{grid-template-columns:1fr;} }
+
+.code-panel{
+  background:var(--panel); border-radius:8px; padding:14px 10px;
+  border:2px solid var(--line); transition:border-color .25s, box-shadow .25s;
+  overflow-x:auto;
+}
+.code-panel.valid{border-color:var(--ok); box-shadow:0 0 0 3px rgba(79,214,153,.12);}
+.code-panel.invalid{border-color:var(--err); box-shadow:0 0 0 3px rgba(239,109,109,.10);}
+
+.row{
+  display:flex; align-items:center; gap:8px; padding:6px 8px; margin:1px 0;
+  border-radius:5px; cursor:grab; user-select:none; white-space:pre;
+  border:1px solid transparent; outline:none;
+}
+.row:hover{background:rgba(255,255,255,.04);}
+.row.selected{background:rgba(124,197,247,.12); border-color:var(--tag);}
+.row:focus-visible{border-color:#fff;}
+.row.dragging{opacity:.35;}
+.row .handle{color:var(--muted); font-size:.8rem; width:1.2em; text-align:center; flex-shrink:0;}
+.row .code{font-size:.92rem;}
+.code .tagname{color:var(--tag); font-weight:600;}
+.code .tagname.close{color:var(--tagclose);}
+.code .brace{color:var(--brace);}
+.code .txt{color:var(--textnode);}
+
+.side{display:flex; flex-direction:column; gap:16px;}
+.panel{background:var(--panel2); border:1px solid var(--line); border-radius:8px; padding:14px 16px; min-height:110px;}
+.panel h2{font-size:.72rem; text-transform:none; letter-spacing:.3px; color:var(--muted); margin:0 0 8px; font-weight:600;}
+.panel p{margin:0; font-size:.88rem; line-height:1.55;}
+.placeholder{color:var(--muted);}
+
+.status-panel.ok p{color:var(--ok);}
+.status-panel.bad p{color:var(--err);}
+.status-icon{font-size:1.1rem; margin-right:6px;}
+
+.hint{color:var(--muted); font-size:.78rem; margin:0; line-height:1.5;}
+kbd{background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:1px 6px; font-size:.78rem;}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>HTML-Struktur-Trainer</h1>
+<p class="sub">Bring die Bauteile links in die richtige Reihenfolge, sodass eine gültige Webseite mit Titel, einer Überschrift und einem Absatz mit einem fett hervorgehobenen Wort entsteht. Klicke ein Element an, um rechts mehr dazu zu erfahren.</p>
+
+<div class="layout">
+  <div id="codePanel" class="code-panel">
+    <div id="list"></div>
+  </div>
+
+  <div class="side">
+    <div class="panel status-panel" id="statusPanel">
+      <h2>Status</h2>
+      <p class="placeholder" id="statusText">Ordne die Zeilen neu, um die Prüfung zu starten.</p>
+    </div>
+    <div class="panel" id="infoPanel">
+      <h2>Element-Info</h2>
+      <p class="placeholder" id="infoText">Klicke ein Element an, um seine Erklärung zu sehen.</p>
+    </div>
+    <div class="panel hint-panel">
+      <p class="hint">Ziehen mit der Maus verschiebt eine Zeile. Ein Element anklicken und dann <kbd>↑</kbd> / <kbd>↓</kbd> drücken funktioniert genauso.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+const TAG_INFO = {
+  html:  'Wurzelelement. Umschließt die komplette HTML-Seite.',
+  head:  'Enthält Informationen für den Browser (z. B. den Seitentitel). Wird nicht direkt angezeigt.',
+  title: 'Legt den Text fest, der im Browser-Tab steht.',
+  body:  'Enthält den sichtbaren Inhalt der Seite.',
+  h1:    'Größte Überschrift der Seite.',
+  p:     'Ein Textabsatz.',
+  b:     'Stellt den enthaltenen Text fett dar.'
+};
+
+// depth = feste Einrückung (zeigt die richtige Ebene, ändert sich nicht beim Sortieren)
+const ITEMS = [
+  {id:1,  type:'open',  tag:'html',  depth:0},
+  {id:2,  type:'open',  tag:'head',  depth:1},
+  {id:3,  type:'open',  tag:'title', depth:2},
+  {id:4,  type:'text',  depth:3, text:'Meine Webseite', info:'Der Seitentitel – erscheint im Browser-Tab.'},
+  {id:5,  type:'close', tag:'title', depth:2},
+  {id:6,  type:'close', tag:'head',  depth:1},
+  {id:7,  type:'open',  tag:'body',  depth:1},
+  {id:8,  type:'open',  tag:'h1',    depth:2},
+  {id:9,  type:'text',  depth:3, text:'Willkommen', info:'Der sichtbare Text der Überschrift.'},
+  {id:10, type:'close', tag:'h1',    depth:2},
+  {id:11, type:'open',  tag:'p',     depth:2},
+  {id:12, type:'text',  depth:3, text:'Ein Text mit', info:'Normaler Fließtext im Absatz.'},
+  {id:13, type:'open',  tag:'b',     depth:3},
+  {id:14, type:'text',  depth:4, text:'einem fetten Wort', info:'Dieser Text steht innerhalb von <b> und wird fett dargestellt.'},
+  {id:15, type:'close', tag:'b',     depth:3},
+  {id:16, type:'close', tag:'p',     depth:2},
+  {id:17, type:'close', tag:'body',  depth:1},
+  {id:18, type:'close', tag:'html',  depth:0},
+];
+
+const TARGET_ORDER = ITEMS.map(i => i.id);
+let order = shuffle(ITEMS.map(i => i.id));
+let selectedId = null;
+let dragId = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function byId(id){ return ITEMS.find(i => i.id === id); }
+
+function labelHTML(item){
+  const indent = '&nbsp;'.repeat(item.depth*4);
+  if(item.type === 'open')  return `${indent}<span class="brace">&lt;</span><span class="tagname">${item.tag}</span><span class="brace">&gt;</span>`;
+  if(item.type === 'close') return `${indent}<span class="brace">&lt;/</span><span class="tagname close">${item.tag}</span><span class="brace">&gt;</span>`;
+  return `${indent}<span class="txt">${item.text}</span>`;
+}
+
+function infoFor(item){
+  if(item.type === 'text') return item.info;
+  return TAG_INFO[item.tag];
+}
+
+function render(){
+  const list = document.getElementById('list');
+  list.innerHTML = '';
+  order.forEach(id => {
+    const item = byId(id);
+    const row = document.createElement('div');
+    row.className = 'row' + (id === selectedId ? ' selected' : '');
+    row.draggable = true;
+    row.tabIndex = 0;
+    row.dataset.id = id;
+    row.innerHTML = `<span class="handle">⋮⋮</span><span class="code">${labelHTML(item)}</span>`;
+
+    row.addEventListener('click', () => selectRow(id));
+    row.addEventListener('keydown', e => {
+      if(e.key === 'ArrowUp'){ e.preventDefault(); moveBy(id, -1); }
+      if(e.key === 'ArrowDown'){ e.preventDefault(); moveBy(id, 1); }
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); selectRow(id); }
+    });
+    row.addEventListener('dragstart', () => { dragId = id; row.classList.add('dragging'); });
+    row.addEventListener('dragend', () => row.classList.remove('dragging'));
+    row.addEventListener('dragover', e => e.preventDefault());
+    row.addEventListener('drop', e => {
+      e.preventDefault();
+      if(dragId === null || dragId === id) return;
+      reorder(dragId, id);
+    });
+
+    list.appendChild(row);
+  });
+
+  // Fokus nach Tastatur-Verschiebung wiederherstellen
+  if(selectedId !== null){
+    const el = list.querySelector(`[data-id="${selectedId}"]`);
+    if(el) el.focus();
+  }
+
+  checkValidity();
+}
+
+function selectRow(id){
+  selectedId = id;
+  const item = byId(id);
+  document.getElementById('infoText').textContent = infoFor(item);
+  document.getElementById('infoText').classList.remove('placeholder');
+  render();
+}
+
+function moveBy(id, dir){
+  const i = order.indexOf(id);
+  const j = i + dir;
+  if(j < 0 || j >= order.length) return;
+  [order[i], order[j]] = [order[j], order[i]];
+  render();
+}
+
+function reorder(sourceId, targetId){
+  const from = order.indexOf(sourceId);
+  const to = order.indexOf(targetId);
+  order.splice(from, 1);
+  order.splice(to, 0, sourceId);
+  render();
+}
+
+function checkValidity(){
+  const panel = document.getElementById('codePanel');
+  const statusPanel = document.getElementById('statusPanel');
+  const statusText = document.getElementById('statusText');
+
+  const firstWrongIndex = order.findIndex((id, idx) => id !== TARGET_ORDER[idx]);
+
+  if(firstWrongIndex === -1){
+    panel.classList.add('valid'); panel.classList.remove('invalid');
+    statusPanel.classList.add('ok'); statusPanel.classList.remove('bad');
+    statusText.classList.remove('placeholder');
+    statusText.innerHTML = '<span class="status-icon">✅</span>Die Struktur ist gültig – so entsteht die geplante Webseite.';
+  } else {
+    panel.classList.add('invalid'); panel.classList.remove('valid');
+    statusPanel.classList.add('bad'); statusPanel.classList.remove('ok');
+    statusText.classList.remove('placeholder');
+    const actual = byId(order[firstWrongIndex]);
+    const actualDesc = actual.type === 'text' ? `"${actual.text}"` : (actual.type === 'open' ? `<${actual.tag}>` : `</${actual.tag}>`);
+    statusText.innerHTML = `<span class="status-icon">❌</span>Noch nicht korrekt. Prüfe Zeile ${firstWrongIndex+1} (aktuell ${actualDesc}).`;
+  }
+}
+
+render();
+</script>
+</body>
+</html>
