@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sandbox erkunden</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F2F5F7;--card:#fff;--ink:#1B2733;--mute:#5B6B7A;--line:#CBD5DD;--sand:#E3B84B;--sandbg:#FBF1D3;--blue:#2F6F8F;--red:#B83227;--redbg:#FBE4E1;--green:#2E7D4F;--greenbg:#DFF2E6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121A21;--card:#1B262F;--ink:#E8EEF2;--mute:#9FB0BE;--line:#35444F;--sand:#E3B84B;--sandbg:#3A3219;--blue:#6CB4D6;--red:#F08A80;--redbg:#43211E;--green:#6FCB93;--greenbg:#1D3A2A}}
+:root[data-theme="dark"]{--bg:#121A21;--card:#1B262F;--ink:#E8EEF2;--mute:#9FB0BE;--line:#35444F;--sand:#E3B84B;--sandbg:#3A3219;--blue:#6CB4D6;--red:#F08A80;--redbg:#43211E;--green:#6FCB93;--greenbg:#1D3A2A}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 "Source Sans 3",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1,h2,h3{font-family:"Familjen Grotesk","Segoe UI",sans-serif;line-height:1.2;margin:0 0 .4em}
+h1{font-size:2.1rem}h2{font-size:1.4rem}h3{font-size:1.05rem}
+section{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px;margin:22px 0}
+.step{border-left:6px solid var(--sand)}
+.hint{color:var(--mute);font-size:.95rem}
+textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px}
+textarea{min-height:90px;resize:vertical}
+button{font:600 1rem "Source Sans 3",sans-serif;background:var(--blue);color:#fff;border:0;border-radius:6px;padding:9px 16px;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.alt{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+:focus-visible{outline:3px solid var(--sand);outline-offset:2px}
+.reveal{display:none;margin-top:12px;padding:12px 14px;background:var(--sandbg);border-radius:6px}
+.reveal.on{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0}
+.type{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--bg)}
+.bar{height:10px;background:var(--line);border-radius:5px;overflow:hidden;margin:3px 0 8px}
+.bar i{display:block;height:100%;background:var(--blue);width:0;transition:width .5s}
+.row{display:flex;justify-content:space-between;font-size:.9rem;color:var(--mute)}
+.chk{margin:6px 0;font-size:.85rem;font-weight:600}
+.arena{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+@media(max-width:560px){.arena{grid-template-columns:1fr}}
+.box{border-radius:8px;padding:12px;min-height:150px}
+.sb{border:3px dashed var(--sand);background:var(--sandbg)}
+.host{border:2px solid var(--line);background:var(--bg)}
+.chip{display:inline-block;background:var(--ink);color:var(--bg);border-radius:14px;padding:2px 12px;font-weight:600;font-size:.9rem}
+.files{list-style:none;padding:0;margin:6px 0;font-family:ui-monospace,Consolas,monospace;font-size:.88rem}
+.files li{padding:2px 6px;border-radius:4px}
+.files li.new{background:var(--redbg);color:var(--red);font-weight:700}
+.files li.mod{background:var(--redbg);color:var(--red)}
+.opt{display:block;margin:8px 0}
+.goals{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.goal{flex:1 1 90px;text-align:center;border:2px solid var(--line);border-radius:8px;padding:6px;font-weight:600;font-size:.9rem}
+.goal.hit{border-color:var(--red);background:var(--redbg);color:var(--red)}
+.log{font-size:.95rem;margin:8px 0;padding-left:20px}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+td,th{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.wrap{overflow-x:auto}
+.q{margin:14px 0}
+.q button{margin:4px 6px 4px 0}
+.ok{color:var(--green);font-weight:600}.no{color:var(--red);font-weight:600}
+details{margin-top:10px}summary{cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<h1>Sandbox erkunden</h1>
+<p class="hint">Arbeitsweise: Erst selbst denken und aufschreiben, dann vergleichen. Die Lösungen erscheinen erst, wenn du etwas geschrieben hast.</p>
+
+<section class="step" id="s1">
+<h2>1 · Das Problem</h2>
+<p>Eine Firma lässt einen <b>KI-Agenten</b> Programmcode ausführen, den niemand vorher geprüft hat. Der Agent läuft deshalb in einer <b>Sandbox</b> (Sandkasten). Der Rest des Servers, der <b>Host</b>, liegt außerhalb.</p>
+<h3>Frage A: Welches IT-Schutzziel soll die Sandbox vor allem sichern?</h3>
+<textarea id="a1" data-k="a1" placeholder="Meine Vermutung und warum …"></textarea>
+<h3 style="margin-top:14px">Frage B: Was sind Hauptgründe für den Einsatz einer Sandbox?</h3>
+<textarea id="a2" data-k="a2" placeholder="Mindestens zwei Gründe …"></textarea>
+<p><button id="b1" disabled>Mit Musterlösung vergleichen</button> <span class="hint" id="h1">Schreibe zu beiden Fragen mindestens einen Satz.</span></p>
+<div class="reveal" id="r1">
+<b>Vergleiche mit deinen Antworten:</b>
+<ul>
+<li><b>Schutzziel: Integrität.</b> Nichts außerhalb der Sandbox darf unautorisiert verändert werden. Auch Vertraulichkeit und Verfügbarkeit spielen mit, aber die Isolation soll vor allem unerlaubte <i>Änderungen</i> am Host verhindern.</li>
+<li><b>Gründe:</b> unbekannten oder unsicheren Code gefahrlos testen · Schaden begrenzen · Fehler und Angriffe vom restlichen System fernhalten · Malware analysieren · Anwendungen voneinander trennen · saubere, wegwerfbare Testumgebung.</li>
+</ul>
+Markiere in deinen Antworten, was du richtig hattest und was dir gefehlt hat.
+</div>
+</section>
+
+<section class="step" id="s2">
+<h2>2 · Sandbox-Arten erkunden</h2>
+<p>Alle fünf Arten isolieren, aber unterschiedlich stark. <b>Schätze zuerst:</b> Wie stark ist die Isolation (1 = kaum, 5 = sehr stark)? Danach lösen wir auf.</p>
+<div class="grid" id="types"></div>
+<p><button id="b2">Schätzungen auflösen</button></p>
+<div class="reveal" id="r2">
+<b>Aufgabe für das Plenum:</b> Wo lag deine Schätzung am weitesten daneben? Warum ist ein <code>venv</code> <i>keine</i> Sicherheits-Sandbox?
+</div>
+</section>
+
+<section class="step" id="s3">
+<h2>3 · Ausbruch-Labor</h2>
+<p>Der Agent will aus der Sandbox ausbrechen. Du bist die Administratorin oder der Administrator und konfigurierst die Sandbox. <b>Sage vorher voraus</b>, was passiert, und starte dann.</p>
+<div class="opt"><label>Gemeinsames Verzeichnis (Shared Storage):
+<select id="o-vol"><option value="none">nicht eingebunden</option><option value="ro">nur lesen</option><option value="rw">lesen und schreiben</option></select></label></div>
+<label class="opt"><input type="checkbox" id="o-priv"> Container läuft mit Vollrechten (<code>--privileged</code>)</label>
+<label class="opt"><input type="checkbox" id="o-sock"> Docker-Socket des Hosts ist eingebunden</label>
+<label class="opt"><input type="checkbox" id="o-kern"> Host-Kernel ist veraltet (bekannte Lücke)</label>
+<label class="opt"><input type="checkbox" id="o-net"> Netzwerk nach außen unbeschränkt</label>
+<label for="pred"><b>Meine Vorhersage:</b></label>
+<textarea id="pred" data-k="pred" placeholder="Was wird mit diesen Einstellungen passieren? Welche Schutzziele sind betroffen?"></textarea>
+<p><button id="b3" disabled>Agent starten</button></p>
+<div class="arena">
+<div class="box sb"><b>Sandbox</b><br><span class="chip">KI-Agent</span><div class="hint" id="sbstate" style="margin-top:8px">wartet …</div></div>
+<div class="box host"><b>Host / Shared Storage</b><ul class="files" id="files"></ul></div>
+</div>
+<div class="goals"><div class="goal" id="gV">Vertraulichkeit</div><div class="goal" id="gI">Integrität</div><div class="goal" id="gA">Verfügbarkeit</div></div>
+<ul class="log" id="log"></ul>
+<p class="hint">Probiere mindestens drei verschiedene Konfigurationen aus. Finde die Einstellung, bei der der Agent wirklich nichts anrichten kann.</p>
+</section>
+
+<section class="step" id="s4">
+<h2>4 · Erkenntnis sichern</h2>
+<h3>Frage C: Der Agent hat nur <u>neue</u> Dateien im Shared Storage angelegt, keine bestehende verändert. Ist das schon eine Verletzung der Integrität? Begründe.</h3>
+<textarea id="a3" data-k="a3" placeholder="Ja oder nein, weil …"></textarea>
+<p><button id="b4" disabled>Mit Musterlösung vergleichen</button></p>
+<div class="reveal" id="r4">
+<p><b>Ja.</b> Integrität heißt nicht nur „bestehende Dateien bleiben gleich“, sondern auch: der <b>Zustand des Systems</b> darf nicht unautorisiert verändert werden. Eine neue Datei außerhalb des erlaubten Bereichs ist eine unerlaubte Änderung. Die Isolation sollte genau das verhindern.</p>
+<div class="wrap"><table>
+<tr><th>Aspekt</th><th>Ausmaß</th><th>Begründung</th></tr>
+<tr><td>Neue Dateien anlegen</td><td>Hoch</td><td>Unautorisierte Zustandsänderung</td></tr>
+<tr><td>Bestehende Dateien überschreiben</td><td>Sehr hoch</td><td>Direkte Verfälschung von Daten</td></tr>
+<tr><td>Systemweite Folgen</td><td>Hoch bis kritisch</td><td>Ohne Isolation sind Änderungen nicht mehr kontrollierbar</td></tr>
+<tr><td>Nachweisbarkeit</td><td>Oft erschwert</td><td>Logs können selbst manipuliert werden</td></tr>
+</table></div>
+<p><b>Folgen eines Ausbruchs mit Schreibrecht:</b> Konfigurationen manipulieren · Skripte ablegen, die später laufen · Rechte ändern · Logs fälschen · Kaskadeneffekte wie Rechteausweitung und dauerhafte Hintertüren.</p>
+</div>
+
+<h3 style="margin-top:18px">Kurzcheck</h3>
+<div id="quiz"></div>
+</section>
+
+<section class="step" id="s5">
+<h2>5 · Kurz reflektieren</h2>
+<label for="ref">Ein Satz: Was hat sich an deiner Vorstellung von „Sandbox“ geändert? Welche Frage bleibt offen?</label>
+<textarea id="ref" data-k="ref"></textarea>
+<p><button class="alt" id="cp">Meine Antworten kopieren</button> <span class="hint" id="cpm"></span></p>
+</section>
+
+<details>
+<summary>Hinweise für die Lehrkraft</summary>
+<p><b>Lernziel:</b> Die Schüler erklären, welches Schutzziel eine Sandbox sichert, unterscheiden fünf Sandbox-Arten nach Isolationsstärke und benennen typische Konfigurationsfehler.</p>
+<p><b>Ablauf (90 min):</b> Problem und Fragen A/B allein, dann im Tandem (15) · Arten schätzen und auflösen (20) · Labor mit Vorhersage, mind. 3 Läufe (25) · Frage C im Plenum, Kurzcheck (20) · Reflexion (10).</p>
+<p><b>Stolperstellen:</b> venv gilt als „sicher“ · Container gleich VM · „nur lesen“ wirkt harmlos, ist aber ein Vertraulichkeitsproblem · neue Datei gilt nicht als Änderung · Schutzziele werden vermischt.</p>
+<p><b>Woran sehe ich das Verstehen?</b> Die Vorhersagen im Labor passen zum Ergebnis, Frage C wird mit „Systemzustand“ begründet, die Schüler finden die sichere Konfiguration ohne Hilfe.</p>
+<p><b>Differenzieren:</b> Schnelle Schüler erklären im Plenum, warum eine VM trotzdem ausbrechbar ist (Hypervisor, Shared Folders) und schlagen eine eigene Härtung vor.</p>
+</details>
+</main>
+<script>
+var T=[
+{n:"Prozess-Sandbox",d:"z. B. Browser-Tab, Syscall-Filter (seccomp)",iso:2,start:"Millisekunden",res:"sehr gering",kern:"Host-Kernel geteilt",w:"Lücken im Kernel oder Filter; schlecht konfigurierte Regeln."},
+{n:"Virtuelle Umgebung",d:"z. B. Python venv",iso:1,start:"Sekunden",res:"sehr gering",kern:"Alles geteilt",w:"Trennt nur Bibliotheken, keine Rechte. Code darf alles, was der Benutzer darf."},
+{n:"Container",d:"z. B. Docker, Podman",iso:3,start:"Sekunden",res:"gering",kern:"Host-Kernel geteilt",w:"Vollrechte-Modus, eingebundener Socket, Shared Volumes, Kernel-Lücken."},
+{n:"Virtuelle Maschine",d:"z. B. Hyper-V, VirtualBox, KVM",iso:4,start:"Sekunden bis Minuten",res:"hoch",kern:"Eigener Kernel",w:"Hypervisor-Lücken (selten), Shared Folders, Zwischenablage, Snapshots."},
+{n:"Malware-Analyse-Sandbox",d:"Wegwerf-VM auf getrennter Hardware oder Cloud",iso:5,start:"Minuten",res:"sehr hoch",kern:"Eigener Kernel, getrenntes Netz",w:"Schadsoftware erkennt die Sandbox und verhält sich harmlos (Sandbox Evasion)."}];
+var $=function(i){return document.getElementById(i)};
+function store(k,v){try{if(v===undefined)return localStorage.getItem("sbx_"+k);localStorage.setItem("sbx_"+k,v)}catch(e){return null}}
+// Texte speichern und Freigabe prüfen
+document.querySelectorAll("textarea[data-k]").forEach(function(t){var s=store(t.dataset.k);if(s)t.value=s;t.addEventListener("input",function(){store(t.dataset.k,t.value);chk()})});
+function ok(i,n){return $(i).value.trim().length>=n}
+function chk(){$("b1").disabled=!(ok("a1",15)&&ok("a2",15));$("b3").disabled=!ok("pred",10);$("b4").disabled=!ok("a3",15)}
+chk();
+$("b1").onclick=function(){$("r1").classList.add("on")};
+$("b4").onclick=function(){$("r4").classList.add("on")};
+// Arten
+var g=$("types");
+T.forEach(function(t,i){var d=document.createElement("div");d.className="type";
+d.innerHTML="<h3>"+t.n+"</h3><div class='hint'>"+t.d+"</div><label class='chk'>Meine Schätzung (1–5)<select id='e"+i+"'><option value=''>wählen …</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></label><div id='d"+i+"'></div>";g.appendChild(d)});
+$("b2").onclick=function(){
+T.forEach(function(t,i){var e=$("e"+i).value,m=e?(+e===t.iso?"<span class='ok'>Treffer</span>":"<span class='no'>Du: "+e+", tatsächlich: "+t.iso+"</span>"):"<span class='hint'>keine Schätzung</span>";
+$("d"+i).innerHTML=m+"<div class='row'><span>Isolation</span><span>"+t.iso+" / 5</span></div><div class='bar'><i style='width:"+t.iso*20+"%'></i></div><div class='hint'>Start: "+t.start+"<br>Ressourcen: "+t.res+"<br>"+t.kern+"</div><p style='margin:8px 0 0'><b>Schwachstelle:</b> "+t.w+"</p>"});
+$("r2").classList.add("on")};
+// Labor
+function run(){
+var vol=$("o-vol").value,priv=$("o-priv").checked,sock=$("o-sock").checked,kern=$("o-kern").checked,net=$("o-net").checked;
+var V=0,I=0,A=0,L=[],F=["config.ini","kunden.db","logs/system.log"],N=[];
+var full=priv||sock||kern;
+if(vol==="ro"){V=1;L.push("Agent liest alle Dateien im Shared Storage mit. Nichts wird verändert, aber der Inhalt ist nicht mehr geheim (Vertraulichkeit).")}
+if(vol==="rw"){I=1;V=1;N.push("neu: agent_notiz.txt");L.push("Agent legt neue Dateien im Shared Storage an. Das ist schon eine unautorisierte Zustandsänderung (Integrität).")}
+if(priv){L.push("Mit Vollrechten kann der Agent Host-Geräte einbinden und Rechte ändern.")}
+if(sock){L.push("Über den Docker-Socket startet der Agent einen neuen Container mit eingebundenem Host-Dateisystem.")}
+if(kern){L.push("Der Agent nutzt die Kernel-Lücke und wird auf dem Host zu root.")}
+if(full){V=I=A=1;N.push("neu: backdoor.sh","neu: cron-Eintrag (Persistenz)");F[0]="config.ini (verändert)";F[2]="logs/system.log (gelöscht)";L.push("Ausbruch! Konfiguration verändert, Hintertür abgelegt, Logs gelöscht. Folgen: Integrität stark verletzt, dazu Vertraulichkeit und Verfügbarkeit.")}
+if(net){V=1;L.push("Unbeschränktes Netzwerk: Der Agent kann Daten nach außen senden (Vertraulichkeit).")}
+if(!L.length)L.push("Der Agent bleibt in der Sandbox. Der Host ist unverändert. Das ist die Zielkonfiguration.");
+var h="";F.forEach(function(f){h+="<li"+(f.indexOf("(")>0?" class='mod'":"")+">"+f+"</li>"});
+if(vol!=="none"||full)N.forEach(function(f){h+="<li class='new'>"+f+"</li>"});
+$("files").innerHTML=h;
+$("sbstate").textContent=full?"Sandbox durchbrochen":(vol==="rw"?"Sandbox hat ein Loch (Shared Storage)":"Agent ist isoliert");
+$("gV").className="goal"+(V?" hit":"");$("gI").className="goal"+(I?" hit":"");$("gA").className="goal"+(A?" hit":"");
+$("log").innerHTML=L.map(function(x){return"<li>"+x+"</li>"}).join("");
+}
+$("b3").onclick=run;
+// Quiz
+var Q=[
+{q:"Python venv: Ist das eine Sandbox im Sicherheitssinn?",o:["Ja, der Code ist isoliert","Nein, es trennt nur Bibliotheken"],a:1,e:"Ein venv hat keine Rechtetrennung. Der Code läuft mit allen Rechten des Benutzers."},
+{q:"Ein Prozess aus der Sandbox legt eine neue Datei auf dem Host an. Welches Schutzziel ist zuerst verletzt?",o:["Vertraulichkeit","Integrität","Verfügbarkeit"],a:1,e:"Neue Datei = unautorisierte Zustandsänderung des Systems."},
+{q:"Welche Maßnahme schützt am besten gegen Schäden durch Ausbruch?",o:["Shared Storage nur lesbar machen","Gar keine Vollrechte, kein Socket, minimale Einbindungen, Kernel aktuell","Container-Namen ändern"],a:1,e:"Prinzip der geringsten Rechte: so wenig Verbindung zum Host wie möglich."}];
+var qb=$("quiz");
+Q.forEach(function(x,i){var d=document.createElement("div");d.className="q";d.innerHTML="<b>"+x.q+"</b><br>";
+x.o.forEach(function(o,j){var b=document.createElement("button");b.className="alt";b.textContent=o;b.onclick=function(){f.innerHTML=(j===x.a?"<span class='ok'>Richtig. </span>":"<span class='no'>Noch nicht. </span>")+x.e};d.appendChild(b)});
+var f=document.createElement("div");f.className="hint";d.appendChild(f);qb.appendChild(d)});
+// Kopieren
+$("cp").onclick=function(){
+var t="Frage A: "+$("a1").value+"\n\nFrage B: "+$("a2").value+"\n\nVorhersage Labor: "+$("pred").value+"\n\nFrage C: "+$("a3").value+"\n\nReflexion: "+$("ref").value;
+try{navigator.clipboard.writeText(t).then(function(){$("cpm").textContent="Kopiert. In Moodle oder Word einfügen."},function(){$("cpm").textContent="Kopieren nicht möglich. Markiere die Texte von Hand."})}catch(e){$("cpm").textContent="Kopieren nicht möglich."}};
+</script>
+</body>
+</html>
