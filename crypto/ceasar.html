@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caesar Chiffre</title>
+    <style>
+        :root {
+            --bg-color: #fdfdfd;
+            --container-bg: #ffffff;
+            --border-color: #dee2e6;
+            --accent-color: #007bff;
+            --text-color: #343a40;
+            --label-color: #6c757d;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            max-width: 800px;
+            background: var(--container-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            width: 100%;
+        }
+
+        .input-container {
+            flex: 3;
+            position: relative;
+        }
+
+        .code-view {
+            flex: 1;
+            height: 120px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 0.75rem;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            white-space: pre;
+            box-sizing: border-box;
+            display: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: vertical;
+            box-sizing: border-box;
+            color: var(--text-color);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
+        .code-line {
+            line-height: 1.5;
+            min-height: 1.5em;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px dashed var(--border-color);
+            gap: 1rem;
+        }
+
+        .control-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        .control-section.left {
+            align-items: flex-start;
+        }
+
+        .control-section.right {
+            align-items: flex-start;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: var(--label-color);
+        }
+
+        .options-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .options-column {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: flex-start;
+        }
+
+        .info-link {
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+
+        .control-section.right label {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            cursor: pointer;
+            font-weight: normal;
+            font-size: 0.85rem;
+        }
+
+        .highlight {
+            background-color: yellow !important;
+        }
+
+        .text-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0.75rem;
+            border: 1px solid transparent;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            box-sizing: border-box;
+            color: transparent;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .text-overlay .highlight {
+            background-color: yellow;
+            color: var(--text-color);
+        }
+
+        .controls label {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        #shift-value {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="input-group">
+        <label for="plaintext">Klartext (ohne Umlaute ä, ö, ü eingeben)</label>
+        <div class="input-wrapper">
+            <div class="input-container">
+                <textarea id="plaintext" placeholder="Geben Sie hier den Klartext ein..."></textarea>
+                <div id="plaintext-overlay" class="text-overlay"></div>
+            </div>
+            <div id="plaintext-code-view" class="code-view"></div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="control-section left">
+            <label for="shift">
+                <span>Verschiebung (Caesar)</span>
+                <span id="shift-value">0</span>
+            </label>
+            <input type="range" id="shift" min="-8" max="8" value="0">
+        </div>
+
+        <div class="control-section middle">
+            <!-- Freier Bereich zur späteren Verwendung -->
+        </div>
+
+        <div class="control-section right">
+            <div class="section-header">
+                <span class="section-title">Code anzeigen</span>
+                <label style="font-size: 0.8rem; font-weight: normal;"><input type="checkbox" id="toggle-codes"> </label>
+            </div>
+            <div class="options-container">
+                <div class="options-column" id="options-container">
+                    <label><input type="radio" name="mode" id="opt-ascii" checked disabled> ASCII</label>
+                    <label><input type="radio" name="mode" id="opt-binary" disabled> Binärcode</label>
+                    <label><input type="radio" name="mode" id="opt-hex" disabled> Hexcode</label>
+                </div>
+                <a href="ascii_info.html" class="info-link">❓</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label for="ciphertext">Geheimtext</label>
+        <div class="input-wrapper">
+            <div class="input-container">
+                <textarea id="ciphertext" placeholder="Das Ergebnis erscheint hier..."></textarea>
+                <div id="ciphertext-overlay" class="text-overlay"></div>
+            </div>
+            <div id="ciphertext-code-view" class="code-view"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const plaintextArea = document.getElementById('plaintext');
+    const plaintextOverlay = document.getElementById('plaintext-overlay');
+    const plaintextCodeView = document.getElementById('plaintext-code-view');
+    const ciphertextArea = document.getElementById('ciphertext');
+    const ciphertextOverlay = document.getElementById('ciphertext-overlay');
+    const ciphertextCodeView = document.getElementById('ciphertext-code-view');
+    const shiftInput = document.getElementById('shift');
+    const shiftValueDisplay = document.getElementById('shift-value');
+    const toggleCodes = document.getElementById('toggle-codes');
+    const radioButtons = document.querySelectorAll('input[name="mode"]');
+
+    let currentHighlightIndex = -1;
+    let isFollowingCaret = true;
+
+ function formatCodeView(text, mode) {
+        let html = '';
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            if (char === '\n') {
+                html += `<div class="code-line" data-index="${i}">&nbsp;</div>`;
+                continue;
+            }
+            const ascii = text.charCodeAt(i);
+            const safeChar = char.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            let codeDisplay = '';
+            if (mode === 'ascii') {
+                codeDisplay = `(${ascii})`;
+            } else if (mode === 'binary') {
+                codeDisplay = `(${ascii.toString(2).padStart(8, '0')})`;
+            } else if (mode === 'hex') {
+                codeDisplay = `(0x${ascii.toString(16).toUpperCase().padStart(2, '0')})`;
+            }
+
+            html += `<div class="code-line" data-index="${i}"><b>${safeChar}</b> ${codeDisplay}</div>`;
+        }
+        return html;
+    }
+
+    function formatOverlay(text, highlightIndex) {
+        let html = '';
+        for (let i = 0; i < text.length; i++) {
+            const char = text[i];
+            const isHighlighted = i === highlightIndex;
+            const highlightClass = isHighlighted ? ' highlight' : '';
+            const safeChar = char.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            if (char === '\n') {
+                html += `<span class="highlight-char${highlightClass}">\n</span>`;
+            } else {
+                html += `<span class="highlight-char${highlightClass}">${safeChar}</span>`;
+            }
+        }
+        return html;
+    }
+
+    function applyCaesar() {
+        const text = plaintextArea.value;
+        const shift = parseInt(shiftInput.value, 10);
+        shiftValueDisplay.textContent = shift;
+
+        const mode = document.querySelector('input[name="mode"]:checked').id.replace('opt-', '');
+
+        plaintextCodeView.innerHTML = formatCodeView(text, mode);
+
+        let result = '';
+        for (let i = 0; i < text.length; i++) {
+            const charCode = text.charCodeAt(i);
+            const newCharCode = ((charCode + shift) % 128 + 128) % 128;
+            result += String.fromCharCode(newCharCode);
+        }
+        ciphertextArea.value = result;
+        ciphertextCodeView.innerHTML = formatCodeView(result, mode);
+    }
+
+    function updateHighlights(index) {
+        currentHighlightIndex = index;
+        
+        // 1. Update overlays
+        plaintextOverlay.innerHTML = formatOverlay(plaintextArea.value, currentHighlightIndex);
+        ciphertextOverlay.innerHTML = formatOverlay(ciphertextArea.value, currentHighlightIndex);
+
+        // 2. Update code views
+        const pCodeLines = plaintextCodeView.querySelectorAll('.code-line');
+        //let pTargetLine = null;
+        pCodeLines.forEach(line => {
+            if (parseInt(line.dataset.index) === currentHighlightIndex) {
+                line.classList.add('highlight');
+                //pTargetLine = line;
+            } else {
+                line.classList.remove('highlight');
+            }
+        });
+
+        const cCodeLines = ciphertextCodeView.querySelectorAll('.code-line');
+        //let cTargetLine = null;
+        cCodeLines.forEach(line => {
+            if (parseInt(line.dataset.index) === currentHighlightIndex) {
+                line.classList.add('highlight');
+                //cTargetLine = line;
+            } else {
+                line.classList.remove('highlight');
+            }
+        });
+
+        //if (isFollowingCaret) {
+        //    if (pTargetLine) {
+        //        pTargetLine.scrollIntoView({ block: 'nearest' });
+        //    }
+        //    if (cTargetLine) {
+        //        cTargetLine.scrollIntoView({ block: 'nearest' });
+        //    }
+        //}
+    }
+
+    function getTopVisibleIndex(view) {
+        const lines = view.querySelectorAll('.code-line');
+        const containerRect = view.getBoundingClientRect();
+        for (let i = 0; i < lines.length; i++) {
+            const rect = lines[i].getBoundingClientRect();
+            if (rect.bottom > containerRect.top) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    function syncScroll(source, target) {
+        if (target.scrollTop !== source.scrollTop) {
+            target.scrollTop = source.scrollTop;
+        }
+        if (target.scrollLeft !== source.scrollLeft) {
+            target.scrollLeft = source.scrollLeft;
+        }
+    }
+
+    plaintextArea.addEventListener('input', (e) => {
+        isFollowingCaret = true;
+        applyCaesar();
+        updateHighlights(plaintextArea.selectionStart);
+    });
+
+    ciphertextArea.addEventListener('input', (e) => {
+        isFollowingCaret = true;
+        applyCaesar();
+        updateHighlights(ciphertextArea.selectionStart);
+    });
+
+    shiftInput.addEventListener('input', () => {
+        applyCaesar();
+        if (isFollowingCaret) {
+            updateHighlights(plaintextArea.selectionStart);
+        } else {
+            updateHighlights(getTopVisibleIndex(plaintextCodeView));
+        }
+    });
+
+    radioButtons.forEach(rb => rb.addEventListener('change', () => {
+        applyCaesar();
+        if (isFollowingCaret) {
+            updateHighlights(plaintextArea.selectionStart);
+        } else {
+            updateHighlights(getTopVisibleIndex(plaintextCodeView));
+        }
+    }));
+
+    document.addEventListener('selectionchange', () => {
+        if (isFollowingCaret) {
+            let index = -1;
+            if (document.activeElement === plaintextArea) {
+                index = plaintextArea.selectionStart;
+            } else if (document.activeElement === ciphertextArea) {
+                index = ciphertextArea.selectionStart;
+            }
+            
+            if (index !== -1) {
+                updateHighlights(index);
+            }
+        }
+    });
+
+    plaintextCodeView.addEventListener('scroll', () => {
+        syncScroll(plaintextCodeView, ciphertextCodeView);
+         if (!isFollowingCaret) {
+            updateHighlights(getTopVisibleIndex(plaintextCodeView));
+        }
+        //isFollowingCaret = false;
+        //updateHighlights(getTopVisibleIndex(plaintextCodeView));
+    });
+
+    ciphertextCodeView.addEventListener('scroll', () => {
+        syncScroll(ciphertextCodeView, plaintextCodeView);
+         if (!isFollowingCaret) {
+            updateHighlights(getTopVisibleIndex(ciphertextCodeView));
+        }
+        //isFollowingCaret = false;
+        //updateHighlights(getTopVisibleIndex(ciphertextCodeView));
+    });
+
+    plaintextArea.addEventListener('click', () => { isFollowingCaret = true; });
+    ciphertextArea.addEventListener('click', () => { isFollowingCaret = true; });
+    //plaintextCodeView.addEventListener('click', () => { isFollowingCaret = false; });
+    //ciphertextCodeView.addEventListener('click', () => { isFollowingCaret = false; });
+
+    toggleCodes.addEventListener('change', () => {
+        const isChecked = toggleCodes.checked;
+        radioButtons.forEach(rb => rb.disabled = !isChecked);
+        
+        if (isChecked) {
+            plaintextCodeView.style.display = 'block';
+            ciphertextCodeView.style.display = 'block';
+        } else {
+            plaintextCodeView.style.display = 'none';
+            ciphertextCodeView.style.display = 'none';
+        }
+        applyCaesar();
+        updateHighlights(isFollowingCaret ? plaintextArea.selectionStart : getTopVisibleIndex(plaintextCodeView));
+    });
+
+    applyCaesar();
+    updateHighlights(-1);
+</script>
